@@ -104,6 +104,7 @@ Node createNewInternalNode(Node* children, int childrenCount)
     internal->childrenCount = childrenCount;
     for(int i=0;i<childrenCount;i++)
     {
+        children[i]->Parent = node;
         internal->Child[i] = children[i];
     }
 
@@ -140,15 +141,19 @@ bool isInternal(Node node)
 }
 /*R-Tree ADT and basic functions defined above*/
 
-
+/*
 //For debugging purposes://
 int main()
 {
-    Node a = createNewNode(1);
-    Node b = createNewNode(0);
+    int l[2] = {1,3};
+    int p[2] = {2,4};
+    Node a = createNewLeafNode("bi",l);
+
+    Node b = createNewLeafNode("gr",p);
     Node nar[2]={a,b};
     int c[2] = {1,2};
     Node e = createNewInternalNode(nar,sizeof(nar)/sizeof(nar[0]));
     Node d = createNewLeafNode("as",c);
-    Internal internal = (Internal)d->E;
+    Internal internal = (Internal)e->E;
 }
+*/
