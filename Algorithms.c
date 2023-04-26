@@ -72,7 +72,7 @@ LinkedList searchRecursive(Node node, int S[2][dim],LinkedList list)
     return list;                                    //return list after recursive search
 }
 
-LinkedList search(RTree rtree, int S[2][dim])
+LinkedList search(RTree rtree, int S[2][dim])       //returns a LinkedList of LinkedNodes containing the leaf nodes of our tree that overlap with search area
 {
     LinkedList list = createNewLinkedList();        //empty list created with count as 0
 
