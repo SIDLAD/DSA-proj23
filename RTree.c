@@ -110,7 +110,7 @@ Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim])
 Node createNewInternalNode(Node* children, int childrenCount)
 {
     if(!(childrenCount>=m &&childrenCount<=M))
-        return NULL;        //if NULL returned, internal node is NOT created as number of children is not between m and M
+        return NULL;                                    //if NULL returned, internal node is NOT created as number of children is not between m and M
 
     Node node = createNewNode(INTERNAL);
     Internal internal = (Internal)node->E;
@@ -159,7 +159,7 @@ bool updateMBR(Node node)
     return true;
 }
 
-int nodeLevel(Node node)    //O(log n) operation
+int nodeLevel(Node node)                                //O(log n) operation
 {
     int count = 0;
     while(isInternal(node))

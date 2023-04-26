@@ -4,7 +4,9 @@ typedef struct LinkedList* LinkedList;
 typedef struct LinkedNode* LinkedNode;
 /*All typedefs above this*/
 
+int calculateHyperVolume(Node node1,Node node2);
 //insert and split algorithm functions will precede search functions practically as you cannot search what you cannot create
+
 LinkedList createNewLinkedList();
 LinkedList addLinkedNode(LinkedList list, Node node);
 LinkedList searchRecursive(Node node, int S[2][dim],LinkedList list);
@@ -24,6 +26,20 @@ struct LinkedNode
     LinkedNode next;
 };
 /*All structure definitions above this*/
+
+int calculateHyperVolume(Node node1,Node node2)         //in 2 dimensions, the Hyper - volume is basically the Area of the MBR covering node1 and node2
+{
+    int H[2][dim];
+    int hyperVolume = 1;
+    for(int i=0;i<dim;i++)
+    {
+        H[0][i] = fmin(node1->I[0][i],node2->I[0][i]);
+        H[1][i] = fmax(node1->I[1][i],node2->I[1][i]);
+        hyperVolume *= (H[1][i] - H[0][i]);
+    }
+    //H is the hypercuboid region (in 2 dimensions, the rectangular region)
+    return hyperVolume;
+}
 
 LinkedList createNewLinkedList()
 {
