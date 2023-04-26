@@ -2,6 +2,7 @@
 #include<stdbool.h>
 #include<string.h>
 #include<stdio.h>
+#include<math.h>
 /*Libraries to include above this*/
 
 #define dim 2               //number of dimensions = 2
@@ -19,6 +20,19 @@ typedef enum nodeType nodeType;
 
 enum nodeType{LEAF = 0,INTERNAL = 1};
 /*All enums defined above this*/
+
+RTree createNewRTree();
+bool isEmpty(RTree rtree);
+Node createNewNode(nodeType type);
+Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim]);
+Node createNewInternalNode(Node* children, int childrenCount);
+bool updateMBR(Node node);
+int NodeLevel(Node node);
+bool isRoot(Node node);
+bool isLeaf(Node node);
+bool isInternal(Node node);
+/*Function declarations above this*/
+
 struct Node
 {
     Node Parent;
@@ -44,7 +58,6 @@ struct RTree
 {
     Node Root;
 };
-
 /*All structure definitions above this*/
 
 RTree createNewRTree()
@@ -90,6 +103,7 @@ Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim])
         leaf->coordinates[i] = coordinates[i];
     }
 
+    updateMBR(node);
     return node;
 }
 
@@ -108,16 +122,53 @@ Node createNewInternalNode(Node* children, int childrenCount)
         internal->Child[i] = children[i];
     }
 
+    updateMBR(node);
     return node;
 }
 
-/*
-int NodeLevel(Node node)
+bool updateMBR(Node node)
 {
-    //logic goes here
+    if(isLeaf(node))
+    {
+        Leaf leaf = (Leaf)node->E;
+        for(int i=0;i<dim;i++)
+        {
+            node->I[0][i] = node->I[1][i] = leaf->coordinates[i];
+        }
+    }
+    else if(isInternal(node))
+    {
+        Internal internal = (Internal)node->E;
+        if(internal->childrenCount < m) return false;
+        for(int j=0;j<dim;j++)
+        {
+            node->I[0][j] = (internal->Child[0]->I[0][j]);
+            node->I[1][j] = (internal->Child[0]->I[1][j]);
+        }
+        for(int i=1;i<internal->childrenCount;i++)
+        {
+            for(int j=0;j<dim;j++)
+            {
+                node->I[0][j] = fmin(node->I[0][j],internal->Child[i]->I[0][j]);
+                node->I[1][j] = fmax(node->I[1][j],internal->Child[i]->I[1][j]);
+            }
+        }
+    }
+    else
+        return false;
+    return true;
 }
 
-*/
+int NodeLevel(Node node)    //O(log n) operation
+{
+    int count = 0;
+    while(isInternal(node))
+    {
+        count++;
+        node = ((Internal)node->E)->Child[0];
+    }
+    return count;
+}
 
 bool isRoot(Node node)
 {
