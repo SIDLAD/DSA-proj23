@@ -1,8 +1,13 @@
+
+//TODO: implement insert for non-leaf node which requires search-leaf function,
+//TODO:  and implement overflow for non-root node. Then it's done max ~3 hrs work.
+
+//This is clearly a better version than the one we theorized and with implementation of the above 2 TODOs, our assignment is over.
+
 #include<stdlib.h>
 #include<stdbool.h>
 #include<string.h>
 #include<stdio.h>
-#include<math.h>
 /*Libraries to include above this*/
 
 #define dim 2               //number of dimensions = 2
@@ -10,201 +15,234 @@
 #define m 2
 /*Macros defined above this*/
 
-typedef struct RTree* RTree;
-typedef struct Node* Node;
-typedef struct Internal* Internal;
-typedef struct Leaf* Leaf;
+
+typedef struct rTree* RTree;
+typedef struct node* Node;
+typedef struct container* cont;
+
+void fillcont(Node node, cont tmp);
+void assignchild(Node par, cont chi);
 
 typedef enum nodeType nodeType;
 /*All typedefs above this*/
 
-enum nodeType{LEAF = 0,INTERNAL = 1};
 /*All enums defined above this*/
-
-RTree createNewRTree();
-bool isEmpty(RTree rtree);
-Node createNewNode(nodeType type);
-Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim]);
-Node createNewInternalNode(Node* children, int childrenCount);
-bool updateMBR(Node node);
-int nodeLevel(Node node);
-bool isRoot(Node node);
-bool isLeaf(Node node);
-bool isInternal(Node node);
-/*Function declarations above this*/
-
-struct Node
+struct node
 {
-    Node Parent;
-    bool isLeaf;
-    int I[2][dim];          //Minimum Bounding region
-    void * E;
+    Node parent;
+    float I[2][dim];          //Minimum Bounding region
+    cont child;
 };
 
-struct Internal
+struct cont_array
 {
-    Node Child[M];          // array of pointers pointing to its children
-    int childrenCount;
+	cont arr[dim];	
 };
 
-struct Leaf
-{
-    char* tupleIdentifier;  //name of Entity        
-    int coordinates[dim];   //coordinates
-    //Data data;            //points to a location in the disk storing Data
-};
 
-struct RTree
+struct rTree
 {
     Node Root;
 };
-/*All structure definitions above this*/
+
+struct container{
+	Node arr[M+1];
+	int size;
+	bool isLeaf;
+	float I[2][dim]; //Not a redundancy, it stores the MBR points, i.e(xh,xl,yh,yl)
+	
+};
+
+
 
 RTree createNewRTree()
 {
-    RTree rtree = (RTree) malloc(sizeof(struct RTree));
+    RTree rtree = (RTree) malloc(sizeof(struct rTree));
     rtree->Root = NULL;
     return rtree;
 }
 
-bool isEmpty(RTree rtree)
+Node createNewNode(float xl, float yl, float xh, float yh)
 {
-    if (rtree->Root == NULL)
-        return true;
-    return false;
-}
-
-Node createNewNode(nodeType type)
-{
-    Node node = (Node) malloc(sizeof(struct Node));
-    node->isLeaf = !(type);
-    if(node->isLeaf)
-    {
-        node->E = malloc(sizeof(struct Leaf));
-    }
-    else
-    {
-        node->E = malloc(sizeof(struct Internal));
-    }
-
-    return node;
-}
-
-Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim])
-{
-    Node node = createNewNode(LEAF);
-    Leaf leaf = (Leaf)node->E;
+    Node node = (Node) malloc(sizeof(struct node));
+    node->parent=NULL;
+    node->child=NULL;
+    node->I[0][0]=xl;
+    node->I[0][1]=yl;
+    node->I[1][0]=xh;
+    node->I[1][1]=yh;
     
-    leaf->tupleIdentifier = (char*) malloc(sizeof(tupleIdentifier));
-    strcpy(leaf->tupleIdentifier, tupleIdentifier);
 
-    for(int i=0;i<dim;i++)
-    {
-        leaf->coordinates[i] = coordinates[i];
-    }
-
-    updateMBR(node);
     return node;
 }
 
-Node createNewInternalNode(Node* children, int childrenCount)
-{
-    if(!(childrenCount>=m &&childrenCount<=M))
-        return NULL;        //if NULL returned, internal node is NOT created as number of children is not between m and M
-
-    Node node = createNewNode(INTERNAL);
-    Internal internal = (Internal)node->E;
-
-    internal->childrenCount = childrenCount;
-    for(int i=0;i<childrenCount;i++)
-    {
-        children[i]->Parent = node;
-        internal->Child[i] = children[i];
-    }
-
-    updateMBR(node);
-    return node;
-}
-
-bool updateMBR(Node node)
-{
-    if(isLeaf(node))
-    {
-        Leaf leaf = (Leaf)node->E;
-        for(int i=0;i<dim;i++)
-        {
-            node->I[0][i] = node->I[1][i] = leaf->coordinates[i];
-        }
-    }
-    else if(isInternal(node))
-    {
-        Internal internal = (Internal)node->E;
-        if(internal->childrenCount < m) return false;
-        for(int j=0;j<dim;j++)
-        {
-            node->I[0][j] = (internal->Child[0]->I[0][j]);
-            node->I[1][j] = (internal->Child[0]->I[1][j]);
-        }
-        for(int i=1;i<internal->childrenCount;i++)
-        {
-            for(int j=0;j<dim;j++)
-            {
-                node->I[0][j] = fmin(node->I[0][j],internal->Child[i]->I[0][j]);
-                node->I[1][j] = fmax(node->I[1][j],internal->Child[i]->I[1][j]);
-            }
-        }
-    }
-    else
-        return false;
-    return true;
-}
-
-int nodeLevel(Node node)    //O(log n) operation
-{
-    int count = 0;
-    while(isInternal(node))
-    {
-        count++;
-        node = ((Internal)node->E)->Child[0];
-    }
-    return count;
-}
-
-bool isRoot(Node node)
-{
-    if(node->Parent == NULL)
-        return true;
-    return false;
-}
-
-bool isLeaf(Node node)
-{
-    if(node->isLeaf)
-        return true;
-    return false;
-}
-
-bool isInternal(Node node)
-{
-    if(!(node->isLeaf))
-        return true;
-    return false;
-}
-/*R-Tree ADT and basic functions defined above*/
 
 /*
+int NodeLevel(Node node)
+{
+    //logic goes here
+}
+
+*/
+cont createcont(int isitLeaf){
+cont tmp=(cont)malloc(sizeof(struct container));
+tmp->size=0;
+tmp->isLeaf=isitLeaf;
+return tmp;
+}
+
+struct cont_array cbs_split(cont tmp){
+Node C0[M];
+int counter_c0=0;
+Node C1[M];
+int counter_c1=0;
+Node C2[M];
+int counter_c2=0;
+Node C3[M];
+int counter_c3=0;
+
+float cov_x=(tmp->I[0][0]+tmp->I[1][0])/2;
+float cov_y=(tmp->I[0][1]+tmp->I[1][1])/2;
+
+
+for(int i=tmp->size-1;i>=0;i--){
+float obj_x=(tmp->arr[i]->I[0][0]+tmp->arr[i]->I[1][0])/2;
+float obj_y=(tmp->arr[i]->I[0][1]+tmp->arr[i]->I[1][1])/2;
+if(obj_x>cov_x){
+	if(obj_y>cov_y){
+		C2[counter_c2]=tmp->arr[i];
+		counter_c2++;
+	}
+	else{
+		C3[counter_c3]=tmp->arr[i];
+		counter_c3++;
+	}		
+}
+else{
+	if(obj_y>cov_y){
+		C1[counter_c1]=tmp->arr[i];
+		counter_c1++;
+	}
+	else{
+		C0[counter_c0]=tmp->arr[i];
+		counter_c0++;
+	}
+}
+}
+
+cont u[2];
+u[0]=createcont(1);
+u[1]=createcont(1);
+u[0]->size=0;
+u[1]->size=0;
+
+if(counter_c0>counter_c2){
+	for(int i=0;i<=counter_c0-1;i++)
+		fillcont(C0[i],u[0]);
+	for(int i=0;i<=counter_c2-1;i++)
+		fillcont(C2[i],u[1]);
+}
+else{
+	for(int i=0;i<=counter_c0-1;i++)
+		fillcont(C0[i],u[1]);
+	for(int i=0;i<=counter_c2-1;i++)
+		fillcont(C2[i],u[0]);
+}
+if(counter_c1>counter_c3){
+	for(int i=0;i<=counter_c1-1;i++)
+		fillcont(C1[i],u[1]);
+	for(int i=0;i<=counter_c3-1;i++)
+		fillcont(C3[i],u[0]);
+}
+else{
+	if(counter_c3>counter_c1){
+		for(int i=0;i<=counter_c1-1;i++)
+			fillcont(C1[i],u[0]);
+		for(int i=0;i<=counter_c3-1;i++)
+			fillcont(C3[i],u[1]);
+	}
+	//else should come here, see the paper //TODO: should implement tiebreak conditions of least overlap and least total coverage area.	
+}
+struct cont_array new;
+new.arr[0]=u[0];
+new.arr[1]=u[1];
+return new;
+}
+
+
+cont overflow(cont tmp){
+struct cont_array u=cbs_split(tmp);
+cont u0= u.arr[0];
+cont u1= u.arr[1];
+if(tmp->arr[0]->parent==NULL){
+	Node new_root_1 = createNewNode(u0->I[0][0],u0->I[0][1],u0->I[1][0],u0->I[1][1]);
+	Node new_root_2 = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
+	cont new=createcont(0);	
+	fillcont(new_root_1,new);
+	fillcont(new_root_2,new);s
+	assignchild(new_root_1,u0);
+	assignchild(new_root_2,u1);
+
+	return new;
+}
+}
+
+void assignchild(Node par, cont chi){
+	for(int i=0;i<=chi->size-1;i++){
+		(chi->arr[i])->parent=par;}
+	par->child=chi;
+}
+
+void fillcont(Node node, cont tmp){
+if(tmp->size<=(M)){
+tmp->arr[tmp->size]=node;
+tmp->size++;
+//this below calculation will avoid the need of traversing through all of its inner values to calculate MBR.
+if(tmp->size==1){
+tmp->I[0][0]=node->I[0][0];
+tmp->I[0][1]=node->I[0][1];
+tmp->I[1][0]=node->I[1][0];
+tmp->I[1][1]=node->I[1][1];
+}
+else{
+for(int j=0;j<2;j++){
+	if(tmp->I[0][0]>node->I[j][0]){
+		tmp->I[0][0]=node->I[j][0];
+	}
+	if(tmp->I[1][0]<node->I[j][0]){
+		tmp->I[1][0]=node->I[j][0];
+	}
+	if(tmp->I[0][1]>node->I[j][1]){
+		tmp->I[0][1]=node->I[j][1];
+	}
+	if(tmp->I[1][1]<node->I[j][1]){
+		tmp->I[1][1]=node->I[j][1];
+	}	
+}
+}
+if(tmp->size==(M+1)){
+tmp=overflow(tmp);
+
+}
+}
+}
+
+
+
+
+
 //For debugging purposes://
 int main()
 {
-    int l[2] = {1,3};
-    int p[2] = {2,4};
-    Node a = createNewLeafNode("bi",l);
-
-    Node b = createNewLeafNode("gr",p);
-    Node nar[2]={a,b};
-    int c[2] = {1,2};
-    Node e = createNewInternalNode(nar,sizeof(nar)/sizeof(nar[0]));
-    Node d = createNewLeafNode("as",c);
-    Internal internal = (Internal)e->E;
+    Node a = createNewNode(1,9,1,9);
+    Node b = createNewNode(2,20,2,20);
+    Node c = createNewNode(2,19,2,19);
+    Node d = createNewNode(3,20,3,20);
+    cont first=createcont(1);
+    fillcont(a, first);
+    fillcont(b, first);
+    fillcont(c, first);
+    fillcont(d, first);
+    fillcont(a, first);
+    return 0;
 }
-*/
