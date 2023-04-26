@@ -27,7 +27,7 @@ Node createNewNode(nodeType type);
 Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim]);
 Node createNewInternalNode(Node* children, int childrenCount);
 bool updateMBR(Node node);
-int NodeLevel(Node node);
+int nodeLevel(Node node);
 bool isRoot(Node node);
 bool isLeaf(Node node);
 bool isInternal(Node node);
@@ -159,7 +159,7 @@ bool updateMBR(Node node)
     return true;
 }
 
-int NodeLevel(Node node)    //O(log n) operation
+int nodeLevel(Node node)    //O(log n) operation
 {
     int count = 0;
     while(isInternal(node))
