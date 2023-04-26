@@ -4,6 +4,10 @@
 
 //This is clearly a better version than the one we theorized and with implementation of the above 2 TODOs, our assignment is over.
 
+//Also CBS SPlit is completed, just have minor TODO in it too, with the tie break scenario.
+
+//this "https://www.cse.cuhk.edu.hk/~taoyf/course/infs4205/lec/rtree.pdf" is a far better resource and deals with Rtrees with points. Following this helped me navigate the clutter created before.
+
 #include<stdlib.h>
 #include<stdbool.h>
 #include<string.h>
