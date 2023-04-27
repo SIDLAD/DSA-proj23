@@ -56,7 +56,6 @@ struct container{
 	int size;
 	bool isLeaf;
 	float I[2][dim]; //Not a redundancy, it stores the MBR points, i.e(xh,xl,yh,yl)
-	cont root;
 };
 
 
@@ -91,12 +90,10 @@ int NodeLevel(Node node)
 }
 
 */
-cont createcont(int isitLeaf, cont r){
+cont createcont(int isitLeaf){
 cont tmp=(cont)malloc(sizeof(struct container));
 tmp->size=0;
 tmp->isLeaf=isitLeaf;
-if(r==NULL)
-tmp->root=tmp;
 return tmp;
 }
 
@@ -140,8 +137,8 @@ else{
 }
 
 cont u[2];
-u[0]=createcont(tmp->isLeaf,tmp->root);
-u[1]=createcont(tmp->isLeaf,tmp->root);
+u[0]=createcont(tmp->isLeaf);
+u[1]=createcont(tmp->isLeaf);
 u[0]->size=0;
 u[1]->size=0;
 
@@ -180,22 +177,21 @@ return new;
 }
 
 
-cont overflow(cont tmp){
+void overflow(RTree r,cont tmp){
 struct cont_array u=cbs_split(tmp);
 cont u0= u.arr[0];
 cont u1= u.arr[1];
 if(tmp->arr[0]->parent==NULL){
 	Node new_root_1 = createNewNode(u0->I[0][0],u0->I[0][1],u0->I[1][0],u0->I[1][1]);
 	Node new_root_2 = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
-	cont new=createcont(0, NULL);	
-	fillcont(new_root_1,new);
-	fillcont(new_root_2,new);
-	u0->root=new;
-	u1->root=new;
+	cont new=createcont(0);	
+	fillcont(r,new_root_1,new);
+	fillcont(r,new_root_2,new);
+	r->Root=new;
 	assignchild(new_root_1,new,u0);
 	assignchild(new_root_2,new,u1);
+	free(tmp);
 
-	return new;
 }
 
 else{
@@ -204,10 +200,32 @@ else{
 	(u0->arr[0]->parent)->I[1][0]=u0->I[1][0];
 	(u0->arr[0]->parent)->I[1][1]=u0->I[1][1];
 	
+	for(int i=0;i<(tmp->size)-1;i++){
+	Node node=tmp->arr[i];
+	for(int j=0;j<2;j++){
+	if(tmp->I[0][0]>node->I[j][0]){
+		tmp->I[0][0]=node->I[j][0];
+	}
+	if(tmp->I[1][0]<node->I[j][0]){
+		tmp->I[1][0]=node->I[j][0];
+	}
+	if(tmp->I[0][1]>node->I[j][1]){
+		tmp->I[0][1]=node->I[j][1];
+	}
+	if(tmp->I[1][1]<node->I[j][1]){
+		tmp->I[1][1]=node->I[j][1];
+	}	
+	}
+	}
+
 	Node new_tmp = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
-	fillcont(new_tmp,(u1->arr[0])->par_cont);
+	assignchild(new_tmp,tmp->arr[0]->par_cont,u1);
+	tmp->par_cont->arr[tmp->par_cont->size]=new_tmp;
+	tmp->par_cont->size++;
+	if(tmp->par_cont->size==M+1)
+	overflow(r, tmp->par_cont);	
+	free(tmp);
 	
-	return u0->root;
 		
 }
 
@@ -222,18 +240,93 @@ void assignchild(Node par, cont paren,cont chi){
 }
 
 
-cont searchleafnode(node p,cont u){
+cont chooseLeaf(cont tmp,Node point){
+//calculates the perimeter increase and choses the node with less perimeter increase. In case of tie, smallest MBR region is chosen
+
+	while(tmp->isLeaf==0){
+	float tmp_increase;
+	int perimeter=(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])+(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1]);
+	if(tmp->arr[0]->I[0][0]<point->I[0][0] && tmp->arr[0]->I[1][0]>point->I[0][0] && tmp->arr[0]->I[0][1]<point->I[0][1] && tmp->arr[0]->I[1][1]>point->I[0][1])
+	tmp_increase=0.0;
+	else if(tmp->arr[0]->I[0][0]>point->I[0][0]){
+		if(tmp->arr[0]->I[0][1]>point->I[0][1])
+			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])+(tmp->arr[0]->I[1][0]-point->I[0][0])-perimeter;
+		else if(tmp->arr[0]->I[0][1]<point->I[0][1] && tmp->arr[0]->I[1][1]>point->I[0][1])
+			tmp_increase=(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1])+(tmp->arr[0]->I[1][0]-point->I[0][0])-perimeter;
+		else
+			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])+(tmp->arr[0]->I[1][0]-point->I[0][0])-perimeter;
+		}
+	else if(tmp->arr[0]->I[1][0]<point->I[0][0]){
+		if(tmp->arr[0]->I[0][1]>point->I[0][1])
+			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])+(point->I[0][0]-tmp->arr[0]->I[0][0])-perimeter;
+		else if(tmp->arr[0]->I[0][1]<point->I[0][1] && tmp->arr[0]->I[1][1]>point->I[0][1])
+			tmp_increase=(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1])+(point->I[0][0]-tmp->arr[0]->I[0][0])-perimeter;
+		else
+			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])+(point->I[0][0]-tmp->arr[0]->I[0][0])-perimeter;
+		}
+	float mbr=(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])*(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1]);
+	int tmp_i=0;
+	for(int i=1;i<tmp->size;i++){
+		Node t=tmp->arr[i];
+
+
+
+		float tmp_inc;
+		perimeter=(t->I[1][0]-t->I[0][0])+(t->I[1][1]-t->I[0][1]);
+		if(t->I[0][0]<point->I[0][0] && t->I[1][0]>point->I[0][0] && t->I[0][1]<point->I[0][1] && t->I[1][1]>point->I[0][1])
+			tmp_inc=0.0;
+		else if(t->I[0][0]>point->I[0][0]){
+			if(t->I[0][1]>point->I[0][1])
+				tmp_inc=(t->I[1][1]-point->I[0][1])+(t->I[1][0]-point->I[0][0])-perimeter;
+			else if(t->I[0][1]<point->I[0][1] && t->I[1][1]>point->I[0][1])
+				tmp_inc=(t->I[1][1]-t->I[0][1])+(t->I[1][0]-point->I[0][0])-perimeter;
+			else
+				tmp_inc=(point->I[0][1]-t->I[0][1])+(t->I[1][0]-point->I[0][0])-perimeter;
+			}
+		else if(t->I[1][0]<point->I[0][0]){
+			if(t->I[0][1]>point->I[0][1])
+				tmp_inc=(t->I[1][1]-point->I[0][1])+(point->I[0][0]-t->I[0][0])-perimeter;
+			else if(t->I[0][1]<point->I[0][1] && t->I[1][1]>point->I[0][1])
+				tmp_inc=(t->I[1][1]-t->I[0][1])+(point->I[0][0]-t->I[0][0])-perimeter;
+			else
+				tmp_inc=(point->I[0][1]-t->I[0][1])+(point->I[0][0]-t->I[0][0])-perimeter;
+			}
+		float tmp_mbr=(t->I[1][0]-t->I[0][0])*(t->I[1][1]-t->I[0][1]);
+		
+		if(tmp_inc<tmp_increase){
+			tmp_i=i;
+			tmp_increase=tmp_inc;
+			mbr=tmp_mbr;
+		}
+		else if(tmp_inc==tmp_increase){
+			if(tmp_mbr<=mbr){
+				tmp_i=i;
+				mbr=tmp_mbr;
+			}
+			
+		}
+		
+		
+	}
+	tmp=tmp->arr[tmp_i]->child;
 	
+	}
+	
+	return tmp;
 }
 
 
+void fillcont(RTree r,Node node, cont tmp){ //aka insertion
+if(tmp->isLeaf==0){
+	tmp=chooseLeaf(tmp,node);
+}
 
-void fillcont(Node node, cont tmp){ //aka insertion
-if(tmp->isLeaf==1){
 if(tmp->size<=(M)){
 tmp->arr[tmp->size]=node;
 tmp->size++;
 //this below calculation will avoid the need of traversing through all of its inner values to calculate MBR.
+
+
 if(tmp->size==1){
 tmp->I[0][0]=node->I[0][0];
 tmp->I[0][1]=node->I[0][1];
@@ -241,6 +334,7 @@ tmp->I[1][0]=node->I[1][0];
 tmp->I[1][1]=node->I[1][1];
 }
 else{
+//TODO: change I of parent nodes too.
 for(int j=0;j<2;j++){
 	if(tmp->I[0][0]>node->I[j][0]){
 		tmp->I[0][0]=node->I[j][0];
@@ -256,17 +350,17 @@ for(int j=0;j<2;j++){
 	}	
 }
 }
+if(r->Root==NULL)
+r->Root=tmp;
+
 if(tmp->size==(M+1)){
-if(tmp->isLeaf==1)
-tmp=overflow(tmp);
+
+overflow(r,tmp);
 
 }
 }
-}
 
-else{
- searchleafnode();
-}
+
 
 }
 
@@ -281,13 +375,12 @@ int main()
     Node b = createNewNode(2,20,2,20);
     Node c = createNewNode(2,19,2,19);
     Node d = createNewNode(3,20,3,20);
-    cont first=createcont(1, NULL);
+    cont first=createcont(1);
     RTree rt = createNewRTree();
-    rt->root=first;
-    fillcont(a, first);
-    fillcont(b, first);
-    fillcont(c, first);
-    fillcont(d, first);
-    fillcont(a, first);
+    fillcont(rt,a, first);
+    fillcont(rt,b, first);
+    fillcont(rt,c, first);
+    fillcont(rt,d, first);
+    fillcont(rt,a, first);
     return 0;
 }
