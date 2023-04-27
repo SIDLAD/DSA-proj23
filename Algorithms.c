@@ -1,58 +1,56 @@
 #include "RTree.c"
 
-typedef struct LinkedList* LinkedList;
-typedef struct LinkedNode* LinkedNode;
+typedef struct linkedList* LinkedList;
+typedef struct linkedNode* LinkedNode;
 /*All typedefs above this*/
 
-int calculateHyperVolume(Node node1,Node node2);
-//insert and split algorithm functions will precede search functions practically as you cannot search what you cannot create
+RTree InsertNewDataEntry(Data dataEntry,RTree rtree);
+Node ChooseLeaf(Data dataEntry,RTree rtree);
+RTree AdjustTree(Node node1, Node node2);                               //node2 can be null if original node was not split
+bool CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
 
 LinkedList createNewLinkedList();
-LinkedList addLinkedNode(LinkedList list, Node node);
+LinkedList addToLinkedList(Data data, LinkedList list);
+
 LinkedList searchRecursive(Node node, int S[2][dim],LinkedList list);
 LinkedList search(RTree rtree, int S[2][dim]);
+
 bool overlaps(int I[2][dim],int S[2][dim]);
 /*Function declarations above this*/
 
-struct LinkedList
+struct linkedList
 {
     LinkedNode head;
     int count;
 };
 
-struct LinkedNode
+struct linkedNode
 {
-    Node node;
+    Data data;
     LinkedNode next;
 };
 /*All structure definitions above this*/
 
-int calculateHyperVolume(Node node1,Node node2)         //in 2 dimensions, the Hyper - volume is basically the Area of the MBR covering node1 and node2
+//TODO: working on it right now
+RTree InsertNewDataEntry(Data dataEntry,RTree rtree)
 {
-    int H[2][dim];
-    int hyperVolume = 1;
-    for(int i=0;i<dim;i++)
-    {
-        H[0][i] = fmin(node1->I[0][i],node2->I[0][i]);
-        H[1][i] = fmax(node1->I[1][i],node2->I[1][i]);
-        hyperVolume *= (H[1][i] - H[0][i]);
-    }
-    //H is the hypercuboid region (in 2 dimensions, the rectangular region)
-    return hyperVolume;
+    // Node node = ChooseLeaf(dataEntry,rtree);
+    // if()
+    return rtree;
 }
 
 LinkedList createNewLinkedList()
 {
-    LinkedList list = (LinkedList) malloc(sizeof(struct LinkedList));
+    LinkedList list = (LinkedList) malloc(sizeof(struct linkedList));
     list->count = 0;
     list->head = NULL;
     return list;
 }
 
-LinkedList addLinkedNode(LinkedList list, Node node)
+LinkedList addToLinkedList(Data data, LinkedList list)
 {
-    LinkedNode linkedNode = (LinkedNode) malloc(sizeof(struct LinkedNode));
-    linkedNode->node = node;
+    LinkedNode linkedNode = (LinkedNode) malloc(sizeof(struct linkedNode));
+    linkedNode->data = data;
     linkedNode->next = NULL;
 
     if(list->count == 0)
@@ -71,32 +69,28 @@ LinkedList addLinkedNode(LinkedList list, Node node)
 
 LinkedList searchRecursive(Node node, int S[2][dim],LinkedList list)
 {
-    if(isInternal(node))
+    for(int i=0;i<node->entryCount;i++)
     {
-        Internal internal = (Internal) node->E;
-        for(int i=0;i<internal->childrenCount;i++)
+        if(overlaps(node->entries[i]->I,S))
         {
-            Node child = internal->Child[i];
-            if(overlaps(child->I,S))                //if child area overlaps with S, then continue searchRecursive on child
-                searchRecursive(node,S,list);
+            if(! node->isLeaf)
+                searchRecursive((Node)node->entries[i],S,list);
+            else
+                addToLinkedList((Data)node->entries[i],list);
         }
-    }
-    else
-    {
-        addLinkedNode(list,node);                   //if that child turns out to be a leaf, then add to list
     }
     return list;                                    //return list after recursive search
 }
 
-LinkedList search(RTree rtree, int S[2][dim])       //returns a LinkedList of LinkedNodes containing the leaf nodes of our tree that overlap with search area
+LinkedList search(RTree rtree, int S[2][dim])       //returns a LinkedList of LinkedNodes containing the leaf nodes of our tree that overlaps with S
 {
     LinkedList list = createNewLinkedList();        //empty list created with count as 0
 
     if(isEmpty(rtree))
-        return list;
-    Node node = rtree->Root;                        //empty list returned if R-tree is empty
+        return list;                                //empty list returned if R-tree is empty
+    Node node = rtree->root;                        
     if(!overlaps(node->I,S))
-        return list;                                //empty list returned if Root area does not overlap with S
+        return list;                                //empty list returned if Root does not overlap with S
     return searchRecursive(node,S,list);            //searchRecursive
 }
 

@@ -38,7 +38,8 @@ struct node
     float I[2][dim];
     bool isLeaf;
     int entryCount;
-    Entry entries[M];                                               //entries can be an array of child-nodes or data entries depending on whether the node is leaf node or internal node
+    Entry entries[M+1];                                               //entries can be an array of child-nodes or data entries depending on whether the node is leaf node or internal node
+    //NOTE: entries can be at max M, but leaves space for M+1 so that a node to be split during insertion can TEMPORARILY store an extra entry
     Node parent;
 };
 
