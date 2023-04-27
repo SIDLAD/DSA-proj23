@@ -204,11 +204,14 @@ int main()
     float coordinates2[dim] = {2,3};
     float coordinates3[dim] = {1,9};
     float coordinates4[dim] = {-1,8.9};
+    float coordinates5[dim] = {6,5};
+
     
     InsertNewDataEntry(coordinates,"DaBomb",rtree);
     InsertNewDataEntry(coordinates2,"Data2",rtree);
     InsertNewDataEntry(coordinates3,"Data3",rtree);
     InsertNewDataEntry(coordinates4,"Data4",rtree);
+    InsertNewDataEntry(coordinates5,"Data5",rtree);
 
     printf("Points inserted in RTree:\n(%f %f)\n",coordinates[0],coordinates[1]);
     printf("(%f %f)\n",coordinates2[0],coordinates2[1]);
