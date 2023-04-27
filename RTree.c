@@ -195,8 +195,30 @@ float calculateCombinedArea(Entry E1, Entry E2)
 //For debugging purposes://
 int main()
 {
+    printf("Hello\n");
+    float coordinates[dim] = {1,0};
+    float coordinates2[dim] = {2,3};
+    float coordinates3[dim] = {1,9};
+    float coordinates4[dim] = {-1,8.9};
+    Data item = createDataItem(coordinates,"IAmDaBomb");
+    Data item2 = createDataItem(coordinates2,"MeDaBomb");
+    Data item3 = createDataItem(coordinates3,"BombaBombaBombBomb");
+    Data item4 = createDataItem(coordinates4,"YouDaBomb");
 
-    printf("!@3123\n");
+    Data items[] = {item,item2};
+    Data items2[] = {item3,item4};
+    Node leaf = createNewLeafNode(sizeof(items)/sizeof(items[0]),items);
+    Node leaf2 = createNewLeafNode(sizeof(items2)/sizeof(items2[0]),items2);
+
+    Node arrayOfLeaves[] = {leaf,leaf2};
+    Node internal = createNewInternalNode(sizeof(arrayOfLeaves)/sizeof(arrayOfLeaves[0]),arrayOfLeaves);
+
+    RTree rtree = createNewRTree();
+    rtree->root = internal;
+    for(int i=0;i<dim;i++)
+    {
+        printf("%f %f\n",rtree->root->I[0][i],rtree->root->I[1][i]);
+    }
     return 0;
 }
 */
