@@ -225,6 +225,7 @@ for(int j=0;j<2;j++){
 }
 }
 if(tmp->size==(M+1)){
+if(tmp->isLeaf==1)
 tmp=overflow(tmp);
 
 }
