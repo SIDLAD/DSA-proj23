@@ -223,7 +223,7 @@ bool overlaps(float I[2][dim],float S[2][dim])
     return isOverlap;                               //else I and S overlap
 }
 
-
+/*
 //For debugging purposes://
 int main()
 {
@@ -262,3 +262,4 @@ int main()
     }
     return 0;
 }
+*/
