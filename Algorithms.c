@@ -4,7 +4,7 @@ typedef struct linkedList* LinkedList;
 typedef struct linkedNode* LinkedNode;
 /*All typedefs above this*/
 
-RTree InsertNewDataEntry(Data dataEntry,RTree rtree);
+RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
 Node ChooseLeaf(Data dataEntry,RTree rtree);
 RTree AdjustTree(Node node1, Node node2);                               //node2 can be null if original node was not split
 bool CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
@@ -31,11 +31,26 @@ struct linkedNode
 };
 /*All structure definitions above this*/
 
-//TODO: working on it right now
-RTree InsertNewDataEntry(Data dataEntry,RTree rtree)
+RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree)
 {
-    // Node node = ChooseLeaf(dataEntry,rtree);
-    // if()
+    Data dataEntry = createDataItem(coordinates,tupleIdentifier);
+    if(isEmpty(rtree))
+    {
+        Data array[1] = {dataEntry};
+        createNewLeafNode(1,array);
+        return rtree;
+    }
+    
+    Node node = ChooseLeaf(dataEntry,rtree);
+    if(node->entryCount<M)
+    {
+        node->entries[node->entryCount] = (Entry)dataEntry;
+        node->entryCount++;
+    }
+    else
+    {
+        
+    }
     return rtree;
 }
 

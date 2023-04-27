@@ -112,7 +112,7 @@ Node createNewLeafNode(int entryCount, Data dataEntries[])
 
 Node createNewInternalNode(int entryCount,Node nodeEntries[])
 {
-    Node node = createNewNode(INTERNAL,entryCount,(Entry*)nodeEntries);
+    Node node = createNewNode(INTERNAL,entryCount,(Entry*) nodeEntries);
     if(node == NULL)
         return node;
     for(int i=0;i<entryCount;i++)
@@ -164,16 +164,6 @@ int nodeLevel(Node node)
 //For debugging purposes://
 int main()
 {
-    int l[2] = {1,3};
-    int p[2] = {2,4};
-    Node a = createNewLeafNode("bi",l);
-
-    Node b = createNewLeafNode("gr",p);
-    Node nar[2]={a,b};
-    int c[2] = {1,2};
-    Node e = createNewInternalNode(nar,sizeof(nar)/sizeof(nar[0]));
-    Node d = createNewLeafNode("as",c);
-    Internal internal = (Internal)e->E;
     return 0;
 }
 */
