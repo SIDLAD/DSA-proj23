@@ -191,10 +191,12 @@ float calculateCombinedArea(Entry E1, Entry E2)
 
 /*R-Tree ADT and basic functions defined above*/
 
-
+/*
 //For debugging purposes://
 int main()
 {
-    printf("!@3123");
+
+    printf("!@3123\n");
     return 0;
 }
+*/

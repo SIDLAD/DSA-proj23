@@ -12,10 +12,10 @@ Node CBSSplitNode(Node node);                                           //node t
 LinkedList createNewLinkedList();
 LinkedList addToLinkedList(Data data, LinkedList list);
 
-LinkedList searchRecursive(Node node, int S[2][dim],LinkedList list);
-LinkedList search(RTree rtree, int S[2][dim]);
+LinkedList searchRecursive(Node node, float S[2][dim],LinkedList list);
+LinkedList search(RTree rtree, float S[2][dim]);
 
-bool overlaps(int I[2][dim],int S[2][dim]);
+bool overlaps(float I[2][dim],float S[2][dim]);
 /*Function declarations above this*/
 
 struct linkedList
@@ -80,6 +80,17 @@ Node ChooseLeaf(Data dataEntry,RTree rtree)
     return node;
 }
 
+RTree AdjustTree(Node node1, Node node2)                               //node2 can be null if original node was not split
+{
+    printf("Incomplete\n");
+    return NULL;
+}
+
+Node CBSSplitNode(Node node)                                           //node that is going to be split will TEMPORARILY have M+1 entries
+{
+    printf("Incomplete\n");
+    return NULL;
+}
 
 LinkedList createNewLinkedList()
 {
@@ -109,7 +120,7 @@ LinkedList addToLinkedList(Data data, LinkedList list)
     return list;
 }
 
-LinkedList searchRecursive(Node node, int S[2][dim],LinkedList list)
+LinkedList searchRecursive(Node node, float S[2][dim],LinkedList list)
 {
     for(int i=0;i<node->entryCount;i++)
     {
@@ -124,7 +135,7 @@ LinkedList searchRecursive(Node node, int S[2][dim],LinkedList list)
     return list;                                    //return list after recursive search
 }
 
-LinkedList search(RTree rtree, int S[2][dim])       //returns a LinkedList of LinkedNodes containing the leaf nodes of our tree that overlaps with S
+LinkedList search(RTree rtree, float S[2][dim])       //returns a LinkedList of LinkedNodes containing the leaf nodes of our tree that overlaps with S
 {
     LinkedList list = createNewLinkedList();        //empty list created with count as 0
 
@@ -136,7 +147,7 @@ LinkedList search(RTree rtree, int S[2][dim])       //returns a LinkedList of Li
     return searchRecursive(node,S,list);            //searchRecursive
 }
 
-bool overlaps(int I[2][dim],int S[2][dim])
+bool overlaps(float I[2][dim],float S[2][dim])
 {
     bool isOverlap = true;
     for(int i=0;i<dim;i++)
@@ -149,3 +160,13 @@ bool overlaps(int I[2][dim],int S[2][dim])
     }
     return isOverlap;                               //else I and S overlap
 }
+
+/*
+//For debugging purposes://
+int main()
+{
+    
+    printf("hello working world\n");
+    return 0;
+}
+*/
