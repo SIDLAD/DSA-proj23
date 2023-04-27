@@ -7,7 +7,7 @@ typedef struct linkedNode* LinkedNode;
 RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
 Node ChooseLeaf(Data dataEntry,RTree rtree);
 RTree AdjustTree(Node node1, Node node2);                               //node2 can be null if original node was not split
-bool CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
+Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
 
 LinkedList createNewLinkedList();
 LinkedList addToLinkedList(Data data, LinkedList list);
@@ -40,19 +40,46 @@ RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtre
         createNewLeafNode(1,array);
         return rtree;
     }
-    
+
     Node node = ChooseLeaf(dataEntry,rtree);
-    if(node->entryCount<M)
+    node->entries[node->entryCount] = (Entry)dataEntry;
+    node->entryCount++;
+    Node nodeNewOnSplit = NULL;                                     //will become non-NULL if there is a split going to happen
+
+    if(node->entryCount > M)                                        //greater than M can only imply M+1,as the node will be split when that happens
     {
-        node->entries[node->entryCount] = (Entry)dataEntry;
-        node->entryCount++;
+        nodeNewOnSplit = CBSSplitNode(node);                        //returns the new node (the second one) that is created on splitting
     }
-    else
-    {
-        
-    }
+
+    AdjustTree(node,nodeNewOnSplit);
     return rtree;
 }
+
+Node ChooseLeaf(Data dataEntry,RTree rtree)
+{
+    Node node = rtree->root;
+    while(! node->isLeaf)
+    {
+        float minEnlargement = calculateCombinedArea((Entry)node->entries[0],(Entry)dataEntry) - calculateArea((Entry)node->entries[0]);
+        int chosenChildIndex = 0;
+
+        for(int i=1;i<node->entryCount;i++)
+        {
+            float enlargement = calculateCombinedArea((Entry)node->entries[i],(Entry)dataEntry) - calculateArea((Entry)node->entries[i]);
+            if(enlargement < minEnlargement ||                                                                                                  //looking for child that would lead to minimum increase in area
+            (enlargement==minEnlargement && calculateArea((Entry)node->entries[i]) < calculateArea((Entry)node->entries[chosenChildIndex])))    //in case of tie, choose the child with smaller area
+            {
+                chosenChildIndex = i;
+                minEnlargement = enlargement;
+            }
+        }
+        
+        node = (Node)node->entries[chosenChildIndex];
+    }
+
+    return node;
+}
+
 
 LinkedList createNewLinkedList()
 {
