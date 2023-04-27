@@ -52,3 +52,9 @@ Mkfile.old
 dkms.conf
 .vscode/
 testing.c
+Main.c
+
+#Executables that generate such as Algorithms RTree Main
+Algorithms
+RTree
+Main
