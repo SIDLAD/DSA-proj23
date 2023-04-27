@@ -25,8 +25,9 @@ Data createDataItem(float coordinates[dim],char* tupleIdentifier);
 Node createNewNode(NodeType type,int entryCount,Entry entries[]);   //called implicitly while creating leaf or internal node
 Node createNewLeafNode(int entryCount,Data dataEntries[]);
 Node createNewInternalNode(int entryCount,Node nodeEntries[]);
-bool updateMBR(Node node);
+bool defineMBR(Node node);
 int nodeLevel(Node node);
+bool isRoot(Node node);
 /*Function declarations above this*/
 
 struct entry
@@ -101,7 +102,7 @@ Node createNewNode(NodeType type,int entryCount,Entry entries[])    //called imp
         node->entries[i] = entries[i];
     }
 
-    updateMBR(node);
+    defineMBR(node);
     return node;    
 }
 
@@ -124,7 +125,7 @@ Node createNewInternalNode(int entryCount,Node nodeEntries[])
     return node;
 }
 
-bool updateMBR(Node node)
+bool defineMBR(Node node)
 {
     if(node->entryCount <= 0)
         return false;                                                  //false is returned if node has no entries
@@ -157,6 +158,16 @@ int nodeLevel(Node node)
     }
     return level;
 }
+
+bool isRoot(Node node)
+{
+    if(node->parent == NULL)
+    {
+        return true;
+    }
+    return false;
+}
+
 /*R-Tree ADT and basic functions defined above*/
 
 /*

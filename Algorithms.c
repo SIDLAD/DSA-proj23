@@ -6,9 +6,11 @@ typedef struct linkedNode* LinkedNode;
 float calculateArea(Entry E1);
 float calculateCombinedArea(Entry E1, Entry E2);
 
+bool updateMBR(Node parent,Node newChild);
+
 RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
 Node ChooseLeaf(Data dataEntry,RTree rtree);
-RTree AdjustTree(Node node1, Node node2);                               //node2 can be null if original node was not split
+bool AdjustTree(Node node1, Node node2);                               //node2 is null if original node was not split
 Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
 
 LinkedList createNewLinkedList();
@@ -61,6 +63,18 @@ float calculateCombinedArea(Entry E1, Entry E2)
     return area;
 }
 
+bool updateMBR(Node parent,Node newChild)
+{
+    for(int i=0;i<dim;i++)
+    {
+        if(parent->I[0][i] > newChild->I[0][i])
+            parent->I[0][i] = newChild->I[0][i];
+        if(parent->I[1][i] < newChild->I[1][i])
+            parent->I[1][i] = newChild->I[1][i];
+    }
+    return true;
+}
+
 RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree)
 {
     Data dataEntry = createDataItem(coordinates,tupleIdentifier);
@@ -81,7 +95,7 @@ RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtre
         nodeNewOnSplit = CBSSplitNode(node);                        //returns the new node (the second one) that is created on splitting
     }
 
-    AdjustTree(node,nodeNewOnSplit);                                //updateMBR will happen in AdjustTree
+    AdjustTree(node,nodeNewOnSplit);                                //updateMBR of ancestors will happen in AdjustTree
     return rtree;
 }
 
@@ -110,14 +124,32 @@ Node ChooseLeaf(Data dataEntry,RTree rtree)
     return node;
 }
 
-RTree AdjustTree(Node node1, Node node2)                               //node2 can be null if original node was not split
+bool AdjustTree(Node node1, Node node2)                                //node2 is null if original node was not split
 {
-    printf("Adjust Tree Incomplete\n");
-    return NULL;
+    while(!isRoot(node1))
+    {
+        Node parent = node1->parent;
+        updateMBR(parent,node1);
+        if(node2 != NULL)
+        {
+            parent->entries[parent->entryCount] = (Entry)node2;
+            parent->entryCount++;
+            updateMBR(parent,node2);
+
+            Node parentNewOnSplit = NULL;
+            if(parent->entryCount > M)
+            {
+                parentNewOnSplit = CBSSplitNode(parent);
+            }
+            node1 = parent;
+            node2 = parentNewOnSplit;
+        }
+    }
+    return true;
 }
 
-Node CBSSplitNode(Node node)                                           //node that is going to be split will TEMPORARILY have M+1 entries
-{
+Node CBSSplitNode(Node node)                                            //node that is going to be split will TEMPORARILY have M+1 entries
+{                                                                       //this function will also defineMBR of the split nodes
     printf("CBS Incomplete\n");
     return NULL;
 }
@@ -191,7 +223,7 @@ bool overlaps(float I[2][dim],float S[2][dim])
     return isOverlap;                               //else I and S overlap
 }
 
-/*
+
 //For debugging purposes://
 int main()
 {
@@ -230,4 +262,3 @@ int main()
     }
     return 0;
 }
-*/
