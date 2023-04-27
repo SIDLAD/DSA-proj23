@@ -34,8 +34,10 @@ typedef enum nodeType nodeType;
 struct node
 {
     Node parent;
+    cont par_cont;
     float I[2][dim];          //Minimum Bounding region
     cont child;
+    
 };
 
 struct cont_array
@@ -46,7 +48,7 @@ struct cont_array
 
 struct rTree
 {
-    Node Root;
+    cont Root;
 };
 
 struct container{
@@ -54,7 +56,7 @@ struct container{
 	int size;
 	bool isLeaf;
 	float I[2][dim]; //Not a redundancy, it stores the MBR points, i.e(xh,xl,yh,yl)
-	
+	cont root;
 };
 
 
@@ -71,6 +73,7 @@ Node createNewNode(float xl, float yl, float xh, float yh)
     Node node = (Node) malloc(sizeof(struct node));
     node->parent=NULL;
     node->child=NULL;
+    node->par_cont=NULL;
     node->I[0][0]=xl;
     node->I[0][1]=yl;
     node->I[1][0]=xh;
@@ -88,10 +91,12 @@ int NodeLevel(Node node)
 }
 
 */
-cont createcont(int isitLeaf){
+cont createcont(int isitLeaf, cont r){
 cont tmp=(cont)malloc(sizeof(struct container));
 tmp->size=0;
 tmp->isLeaf=isitLeaf;
+if(r==NULL)
+tmp->root=tmp;
 return tmp;
 }
 
@@ -135,8 +140,8 @@ else{
 }
 
 cont u[2];
-u[0]=createcont(1);
-u[1]=createcont(1);
+u[0]=createcont(tmp->isLeaf,tmp->root);
+u[1]=createcont(tmp->isLeaf,tmp->root);
 u[0]->size=0;
 u[1]->size=0;
 
@@ -170,6 +175,7 @@ else{
 struct cont_array new;
 new.arr[0]=u[0];
 new.arr[1]=u[1];
+
 return new;
 }
 
@@ -181,23 +187,49 @@ cont u1= u.arr[1];
 if(tmp->arr[0]->parent==NULL){
 	Node new_root_1 = createNewNode(u0->I[0][0],u0->I[0][1],u0->I[1][0],u0->I[1][1]);
 	Node new_root_2 = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
-	cont new=createcont(0);	
+	cont new=createcont(0, NULL);	
 	fillcont(new_root_1,new);
-	fillcont(new_root_2,new);s
-	assignchild(new_root_1,u0);
-	assignchild(new_root_2,u1);
+	fillcont(new_root_2,new);
+	u0->root=new;
+	u1->root=new;
+	assignchild(new_root_1,new,u0);
+	assignchild(new_root_2,new,u1);
 
 	return new;
 }
+
+else{
+	(u0->arr[0]->parent)->I[0][0]=u0->I[0][0];
+	(u0->arr[0]->parent)->I[0][1]=u0->I[0][1];
+	(u0->arr[0]->parent)->I[1][0]=u0->I[1][0];
+	(u0->arr[0]->parent)->I[1][1]=u0->I[1][1];
+	
+	Node new_tmp = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
+	fillcont(new_tmp,(u1->arr[0])->par_cont);
+	
+	return u0->root;
+		
 }
 
-void assignchild(Node par, cont chi){
+}
+
+void assignchild(Node par, cont paren,cont chi){
 	for(int i=0;i<=chi->size-1;i++){
-		(chi->arr[i])->parent=par;}
+		(chi->arr[i])->parent=par;
+		(chi->arr[i])->par_cont=paren;
+		}
 	par->child=chi;
 }
 
-void fillcont(Node node, cont tmp){
+
+cont searchleafnode(node p,cont u){
+	
+}
+
+
+
+void fillcont(Node node, cont tmp){ //aka insertion
+if(tmp->isLeaf==1){
 if(tmp->size<=(M)){
 tmp->arr[tmp->size]=node;
 tmp->size++;
@@ -232,6 +264,12 @@ tmp=overflow(tmp);
 }
 }
 
+else{
+ searchleafnode();
+}
+
+}
+
 
 
 
@@ -243,7 +281,9 @@ int main()
     Node b = createNewNode(2,20,2,20);
     Node c = createNewNode(2,19,2,19);
     Node d = createNewNode(3,20,3,20);
-    cont first=createcont(1);
+    cont first=createcont(1, NULL);
+    RTree rt = createNewRTree();
+    rt->root=first;
     fillcont(a, first);
     fillcont(b, first);
     fillcont(c, first);
