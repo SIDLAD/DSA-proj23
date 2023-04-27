@@ -3,6 +3,8 @@
 typedef struct linkedList* LinkedList;
 typedef struct linkedNode* LinkedNode;
 /*All typedefs above this*/
+float calculateArea(Entry E1);
+float calculateCombinedArea(Entry E1, Entry E2);
 
 RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
 Node ChooseLeaf(Data dataEntry,RTree rtree);
@@ -31,13 +33,41 @@ struct linkedNode
 };
 /*All structure definitions above this*/
 
+float calculateArea(Entry E1)
+{
+    float area = 1;
+    for(int i=0;i<dim;i++)
+    {
+        float max,min;
+        min = E1->I[0][i];
+        max = E1->I[1][i];
+        area *= (max-min);
+    }
+
+    return area;
+}
+
+float calculateCombinedArea(Entry E1, Entry E2)
+{
+    float area = 1;
+    for(int i=0;i<dim;i++)
+    {
+        float max,min;
+        min = (E1->I[0][i] < E2->I[0][i] ? E1->I[0][i] : E2->I[0][i]);
+        max = (E1->I[1][i] > E2->I[1][i] ? E1->I[1][i] : E2->I[1][i]);
+        area *= (max-min);
+    }
+
+    return area;
+}
+
 RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree)
 {
     Data dataEntry = createDataItem(coordinates,tupleIdentifier);
     if(isEmpty(rtree))
     {
         Data array[1] = {dataEntry};
-        createNewLeafNode(1,array);
+        rtree->root = createNewLeafNode(1,array);
         return rtree;
     }
 
@@ -51,7 +81,7 @@ RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtre
         nodeNewOnSplit = CBSSplitNode(node);                        //returns the new node (the second one) that is created on splitting
     }
 
-    AdjustTree(node,nodeNewOnSplit);
+    AdjustTree(node,nodeNewOnSplit);                                //updateMBR will happen in AdjustTree
     return rtree;
 }
 
@@ -82,13 +112,13 @@ Node ChooseLeaf(Data dataEntry,RTree rtree)
 
 RTree AdjustTree(Node node1, Node node2)                               //node2 can be null if original node was not split
 {
-    printf("Incomplete\n");
+    printf("Adjust Tree Incomplete\n");
     return NULL;
 }
 
 Node CBSSplitNode(Node node)                                           //node that is going to be split will TEMPORARILY have M+1 entries
 {
-    printf("Incomplete\n");
+    printf("CBS Incomplete\n");
     return NULL;
 }
 
@@ -167,6 +197,34 @@ int main()
 {
     
     printf("hello working world\n");
+
+    RTree rtree = createNewRTree();
+
+    float coordinates[dim] = {1,0};
+    float coordinates2[dim] = {2,3};
+    float coordinates3[dim] = {1,9};
+    float coordinates4[dim] = {-1,8.9};
+    
+    InsertNewDataEntry(coordinates,"DaBomb",rtree);
+    InsertNewDataEntry(coordinates2,"Data2",rtree);
+    InsertNewDataEntry(coordinates3,"Data3",rtree);
+    InsertNewDataEntry(coordinates4,"Data4",rtree);
+
+    printf("Points inserted in RTree:\n(%f %f)\n",coordinates[0],coordinates[1]);
+    printf("(%f %f)\n",coordinates2[0],coordinates2[1]);
+    printf("(%f %f)\n",coordinates3[0],coordinates3[1]);
+    printf("(%f %f)\n",coordinates4[0],coordinates4[1]);
+
+    float S[2][dim] = {{1,0},{5,6}};
+    LinkedList list = search(rtree,S);
+
+    printf("\nLet's print the search results' list(nodes contained from x=1 to 5 and y=0 to 6):\n");
+    LinkedNode linkedNode = list->head;
+    for(int i=0;i<list->count;i++)
+    {
+        printf("%s(%f %f)\n",linkedNode->data->tupleIdentifier,linkedNode->data->coordinates[0],linkedNode->data->coordinates[1]);
+        linkedNode = linkedNode->next;
+    }
     return 0;
 }
 */

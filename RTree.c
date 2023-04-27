@@ -27,9 +27,6 @@ Node createNewLeafNode(int entryCount,Data dataEntries[]);
 Node createNewInternalNode(int entryCount,Node nodeEntries[]);
 bool updateMBR(Node node);
 int nodeLevel(Node node);
-
-float calculateArea(Entry E1);
-float calculateCombinedArea(Entry E1, Entry E2);
 /*Function declarations above this*/
 
 struct entry
@@ -160,35 +157,6 @@ int nodeLevel(Node node)
     }
     return level;
 }
-
-float calculateArea(Entry E1)
-{
-    float area = 1;
-    for(int i=0;i<dim;i++)
-    {
-        float max,min;
-        min = E1->I[0][i];
-        max = E1->I[1][i];
-        area *= (max-min);
-    }
-
-    return area;
-}
-
-float calculateCombinedArea(Entry E1, Entry E2)
-{
-    float area = 1;
-    for(int i=0;i<dim;i++)
-    {
-        float max,min;
-        min = (E1->I[0][i] < E2->I[0][i] ? E1->I[0][i] : E2->I[0][i]);
-        max = (E1->I[1][i] > E2->I[1][i] ? E1->I[1][i] : E2->I[1][i]);
-        area *= (max-min);
-    }
-
-    return area;
-}
-
 /*R-Tree ADT and basic functions defined above*/
 
 /*
