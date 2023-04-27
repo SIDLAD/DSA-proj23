@@ -12,6 +12,7 @@ RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtre
 Node ChooseLeaf(Data dataEntry,RTree rtree);
 bool AdjustTree(Node node1, Node node2);                               //node2 is null if original node was not split
 Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
+void calcCovRect(float answer[dim],Entry entry);
 
 LinkedList createNewLinkedList();
 LinkedList addToLinkedList(Data data, LinkedList list);
@@ -24,7 +25,8 @@ bool overlaps(float I[2][dim],float S[2][dim]);
 
 struct linkedList
 {
-    LinkedNode head;
+    LinkedNode start;
+    LinkedNode end;
     int count;
 };
 
@@ -150,15 +152,35 @@ bool AdjustTree(Node node1, Node node2)                                //node2 i
 
 Node CBSSplitNode(Node node)                                            //node that is going to be split will TEMPORARILY have M+1 entries
 {                                                                       //this function will also defineMBR of the split nodes
-    printf("CBS Incomplete\n");
+    //using the concept of bit-masking to implement n-dimensional CBS Algorithm
+
+    float covRect[dim];
+    calcCovRect(covRect,(Entry)node);
+    for(int i=0;i<node->entryCount;i++)
+    {
+        float objRect[dim];
+        calcCovRect(objRect,node->entries[i]);
+
+    }
+
+    //incomplete
     return NULL;
+}
+
+void calcCovRect(float covRect[dim],Entry entry)
+{
+    for(int i=0;i<dim;i++)
+    {
+        covRect[i] = (entry->I[0][i] + entry->I[1][i])/2;
+    }
 }
 
 LinkedList createNewLinkedList()
 {
     LinkedList list = (LinkedList) malloc(sizeof(struct linkedList));
     list->count = 0;
-    list->head = NULL;
+    list->start = NULL;
+    list->end = NULL;
     return list;
 }
 
@@ -170,13 +192,12 @@ LinkedList addToLinkedList(Data data, LinkedList list)
 
     if(list->count == 0)
     {
-        list->head = linkedNode;
+        list->end = list->start = linkedNode;
     }
     else
     {
-        LinkedNode temp = list->head;
-        list->head = linkedNode;
-        linkedNode->next = temp;
+        list->end->next = linkedNode;
+        list->end = linkedNode;
     }
     list->count++;
     return list;
@@ -254,7 +275,7 @@ int main()
     LinkedList list = search(rtree,S);
 
     printf("\nLet's print the search results' list(nodes contained from x=1 to 5 and y=0 to 6):\n");
-    LinkedNode linkedNode = list->head;
+    LinkedNode linkedNode = list->start;
     for(int i=0;i<list->count;i++)
     {
         printf("%s(%f %f)\n",linkedNode->data->tupleIdentifier,linkedNode->data->coordinates[0],linkedNode->data->coordinates[1]);
