@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include<stdbool.h>
 #include<string.h>
+#include<math.h>
 #include<stdio.h>
 /*Libraries to include above this*/
 
@@ -258,7 +259,7 @@ else{
 			}
 		}
 	}
-	//TODO: have to implement the case when less tha m number of nodes are present in node. see CBS paper.
+	//TODO: have to implement the case when less than m number of nodes are present in node. see CBS paper.
 	
 }
 if(u[0]->arr[0]->child!=NULL){
@@ -407,34 +408,34 @@ cont chooseLeaf(cont temp,Node point){
 		if(t->I[0][0]<=point->I[0][0] && t->I[1][0]>=point->I[0][0]){
 				if(t->I[0][1]<=point->I[0][1] && t->I[1][1]>=point->I[0][1])
 					tmp_inc=0.0;
-				else if(tmp->arr[0]->I[0][1]>=point->I[0][1])
-					tmp_inc=(t->I[1][1]-point->I[0][1])*(t->I[1][0]-t->I[0][0])-area;
+				else if(t->I[0][1]>=point->I[0][1])
+					tmp_inc=((t->I[1][1]-point->I[0][1])*(t->I[1][0]-t->I[0][0]))-area;
 				else
-					tmp_inc=(point->I[0][1]-t->I[0][1])*(t->I[1][0]-t->I[0][0])-area;
+					tmp_inc=((point->I[0][1]-t->I[0][1])*(t->I[1][0]-t->I[0][0]))-area;
 		}	
 		else if(t->I[0][0]>=point->I[0][0]){
 			if(t->I[0][1]>=point->I[0][1])
-				tmp_inc=(t->I[1][1]-point->I[0][1])*(t->I[1][0]-point->I[0][0])-area;
+				tmp_inc=((t->I[1][1]-point->I[0][1])*(t->I[1][0]-point->I[0][0]))-area;
 			else if(t->I[0][1]<=point->I[0][1] && t->I[1][1]>=point->I[0][1])
-				tmp_inc=(t->I[1][1]-t->I[0][1])*(t->I[1][0]-point->I[0][0])-area;
+				tmp_inc=((t->I[1][1]-t->I[0][1])*(t->I[1][0]-point->I[0][0]))-area;
 			else
-				tmp_inc=(point->I[0][1]-t->I[0][1])*(t->I[1][0]-point->I[0][0])-area;
+				tmp_inc=((point->I[0][1]-t->I[0][1])*(t->I[1][0]-point->I[0][0]))-area;
 			}
 		else if(t->I[1][0]<=point->I[0][0]){
 			if(t->I[0][1]>=point->I[0][1])
-				tmp_inc=(t->I[1][1]-point->I[0][1])*(point->I[0][0]-t->I[0][0])-area;
+				tmp_inc=((t->I[1][1]-point->I[0][1])*(point->I[0][0]-t->I[0][0]))-area;
 			else if(t->I[0][1]<=point->I[0][1] && t->I[1][1]>=point->I[0][1])
-				tmp_inc=(t->I[1][1]-t->I[0][1])*(point->I[0][0]-t->I[0][0])-area;
+				tmp_inc=((t->I[1][1]-t->I[0][1])*(point->I[0][0]-t->I[0][0]))-area;
 			else
-				tmp_inc=(point->I[0][1]-t->I[0][1])*(point->I[0][0]-t->I[0][0])-area;
+				tmp_inc=((point->I[0][1]-t->I[0][1])*(point->I[0][0]-t->I[0][0]))-area;
 			}
-		tmp_mbr=(t->I[1][0]-t->I[0][0])*(t->I[1][1]-t->I[0][1]);
-		if(tmp_inc<tmp_increase){
+		tmp_mbr=area;
+		if((tmp_inc)<(tmp_increase)){
 			tmp_i=i;
-			tmp_increase=tmp_inc;
+			tmp_increase=(tmp_inc);
 			mbr=tmp_mbr;
 		}
-		else if(tmp_inc==tmp_increase){
+		else if(abs(tmp_inc)==abs(tmp_increase)){
 			if(tmp_mbr<=mbr){
 				tmp_i=i;
 				mbr=tmp_mbr;
@@ -535,6 +536,11 @@ int main()
     Node g = createNewNode(4,5,4,5);
     Node h= createNewNode(3,4,3,4);
     Node i= createNewNode(3,5,3,5);
+    Node j= createNewNode(2,4,2,4);
+    Node k= createNewNode(2,5,2,5);
+    Node l= createNewNode(8,15,8,15);
+    Node mo= createNewNode(8,14,8,14);
+    Node n= createNewNode(7,15,7,15);
     cont first=createcont(1);
     RTree rt = createNewRTree();
     fillcont(rt,a, first);
@@ -543,13 +549,19 @@ int main()
     fillcont(rt,d, rt->Root);
     fillcont(rt,e, rt->Root);
     fillcont(rt,f, rt->Root);
-        printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
+    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
     printf("g insert:%d\n",rt->Root->isLeaf);
     fillcont(rt,g, rt->Root);
-        printf("h insert:%d\n",rt->Root->isLeaf);
-        printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
+    printf("h insert:%d\n",rt->Root->isLeaf);
+    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
     fillcont(rt,h, rt->Root);
-        printf("%f, %f, %f, %f \n", rt->Root->I[0][0],rt->Root->I[0][1],rt->Root->I[1][0],rt->Root->I[1][1]);
-    printf("%f, %f, %f, %f \n", rt->Root->arr[2]->I[0][0],rt->Root->arr[2]->I[0][1],rt->Root->arr[2]->I[1][0],rt->Root->arr[2]->I[1][1]);
+    fillcont(rt,i, rt->Root);
+    fillcont(rt,j, rt->Root);
+    fillcont(rt,k, rt->Root);
+    fillcont(rt,l, rt->Root);
+    fillcont(rt,mo, rt->Root);
+    fillcont(rt,n, rt->Root);
+    printf("%f, %f, %f, %f \n", rt->Root->I[0][0],rt->Root->I[0][1],rt->Root->I[1][0],rt->Root->I[1][1]);
+    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
     return 0;
 }
