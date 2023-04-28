@@ -1,10 +1,4 @@
-//TODO:  and implement overflow for non-root node. Then it's done max ~3 hrs work.
-
-//This is clearly a better version than the one we theorized and with implementation of the above 2 TODOs, our assignment is over.
-
-//Also CBS SPlit is completed, just have minor TODO in it too, with the tie break scenario.
-
-//this "https://www.cse.cuhk.edu.hk/~taoyf/course/infs4205/lec/rtree.pdf" is a far better resource and deals with Rtrees with points. Following this helped me navigate the clutter created before.
+//this "https://www.cse.cuhk.edu.hk/~taoyf/course/infs4205/lec/rtree.pdf" is a better resource and deals with Rtrees with points.
 
 #include<stdlib.h>
 #include<stdbool.h>
@@ -96,6 +90,24 @@ return tmp;
 }
 
 
+float calculateoverlap(float xl1, float yl1, float xh1, float yh1, float xl2, float yl2, float xh2, float yh2)
+{
+    // calculate the leftmost and rightmost x-coordinates of the overlap area
+    float left = (xl1 > xl2) ? xl1 : xl2;
+    float right = (xh1 < xh2) ? xh1 : xh2;
+
+    // calculate the top and bottom y-coordinates of the overlap area
+    float top = (yl1 > yl2) ? yl1 : yl2;
+    float bottom = (yh1 < yh2) ? yh1 : yh2;
+
+    // calculate the width and height of the overlap area
+    float width = (right > left) ? (right - left) : 0.0;
+    float height = (bottom > top) ? (bottom - top) : 0.0;
+
+    // calculate and return the overlap area
+    return width * height;
+}
+
 struct cont_array cbs_split(RTree r,cont tmp){
 Node C0[M];
 int counter_c0=0;
@@ -167,12 +179,87 @@ else{
 		for(int i=0;i<=counter_c3-1;i++)
 			fillcont(r,C3[i],u[1]);
 	}
-	//else should come here, see the paper //TODO: should implement tiebreak conditions of least overlap and least total coverage area.
 	else{
+		float xl1=u[0]->I[0][0], yl1=u[0]->I[0][1], xh1=u[0]->I[1][0], yh1=u[0]->I[1][1];
+		float xl2=u[1]->I[0][0], yl2=u[1]->I[0][1], xh2=u[1]->I[1][0], yh2=u[1]->I[1][1];
+		for(int i=0;i<counter_c3;i++){
+			if(C3[i]->I[0][0]<xl1)
+				xl1=C3[i]->I[0][0];
+			if(C3[i]->I[0][1]<yl1)
+				yl1=C3[i]->I[0][1];
+			if(C3[i]->I[1][0]>xh1)
+				xh1=C3[i]->I[1][0];
+			if(C3[i]->I[1][1]>yh1)
+				yh1=C3[i]->I[1][1];
+		}
+		for(int i=0;i<counter_c1;i++){
+			if(C1[i]->I[0][0]<xl2)
+				xl2=C1[i]->I[0][0];
+			if(C1[i]->I[0][1]<yl2)
+				yl2=C1[i]->I[0][1];
+			if(C1[i]->I[1][0]>xh2)
+				xh2=C1[i]->I[1][0];
+			if(C1[i]->I[1][1]>yh2)
+				yh2=C1[i]->I[1][1];
+		}
+		float overlap_0=calculateoverlap(xl1,yl1,xh1,yh1,xl2,yl2,xh2,yh2);
+		float area_0=(xh1-xl1)*(yh1-yl1)+(xh2-xl2)*(yl2-yl2)-overlap_0;
 		
+		xl1=u[0]->I[0][0]; yl1=u[0]->I[0][1]; xh1=u[0]->I[1][0]; yh1=u[0]->I[1][1];
+		xl2=u[1]->I[0][0]; yl2=u[1]->I[0][1]; xh2=u[1]->I[1][0]; yh2=u[1]->I[1][1];
+		for(int i=0;i<counter_c1;i++){
+			if(C1[i]->I[0][0]<xl1)
+				xl1=C1[i]->I[0][0];
+			if(C1[i]->I[0][1]<yl1)
+				yl1=C1[i]->I[0][1];
+			if(C1[i]->I[1][0]>xh1)
+				xh1=C1[i]->I[1][0];
+			if(C1[i]->I[1][1]>yh1)
+				yh1=C1[i]->I[1][1];
+		}
+		for(int i=0;i<counter_c3;i++){
+			if(C3[i]->I[0][0]<xl2)
+				xl2=C3[i]->I[0][0];
+			if(C3[i]->I[0][1]<yl2)
+				yl2=C3[i]->I[0][1];
+			if(C3[i]->I[1][0]>xh2)
+				xh2=C3[i]->I[1][0];
+			if(C3[i]->I[1][1]>yh2)
+				yh2=C3[i]->I[1][1];
+		}
+		float overlap_1=calculateoverlap(xl1,yl1,xh1,yh1,xl2,yl2,xh2,yh2);
+		float area_1=(xh1-xl1)*(yh1-yl1)+(xh2-xl2)*(yl2-yl2)-overlap_1;
+		
+		if(overlap_0<overlap_1)
+		{
+		for(int i=0;i<=counter_c1-1;i++)
+			fillcont(r,C1[i],u[1]);
+		for(int i=0;i<=counter_c3-1;i++)
+			fillcont(r,C3[i],u[0]);
+		}
+		else if(overlap_0>overlap_1){
+		for(int i=0;i<=counter_c1-1;i++)
+			fillcont(r,C1[i],u[0]);
+		for(int i=0;i<=counter_c3-1;i++)
+			fillcont(r,C3[i],u[1]);
+		}
+		else{
+			if(area_0<area_1){
+			for(int i=0;i<=counter_c1-1;i++)
+				fillcont(r,C1[i],u[1]);
+			for(int i=0;i<=counter_c3-1;i++)
+				fillcont(r,C3[i],u[0]);
+			}
+			else{
+			for(int i=0;i<=counter_c1-1;i++)
+				fillcont(r,C1[i],u[0]);
+			for(int i=0;i<=counter_c3-1;i++)
+				fillcont(r,C3[i],u[1]);
+			}
+		}
 	}
-
-		
+	//TODO: have to implement the case when less tha m number of nodes are present in node. see CBS paper.
+	
 }
 if(u[0]->arr[0]->child!=NULL){
 	u[0]->isLeaf=0;
@@ -462,6 +549,7 @@ int main()
         printf("h insert:%d\n",rt->Root->isLeaf);
         printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
     fillcont(rt,h, rt->Root);
+        printf("%f, %f, %f, %f \n", rt->Root->I[0][0],rt->Root->I[0][1],rt->Root->I[1][0],rt->Root->I[1][1]);
     printf("%f, %f, %f, %f \n", rt->Root->arr[2]->I[0][0],rt->Root->arr[2]->I[0][1],rt->Root->arr[2]->I[1][0],rt->Root->arr[2]->I[1][1]);
     return 0;
 }
