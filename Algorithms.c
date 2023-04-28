@@ -448,6 +448,10 @@ int main()
     InsertNewDataEntry(coordinates8,NULL,rtree);
     InsertNewDataEntry(coordinates9,NULL,rtree);
 
+    /*
+    float searchQuery[2][dim] = {6,5,6,5};
+    printf("Search tupleIdentifier at (6,5) : %s\n",search(rtree,searchQuery)->start->data->tupleIdentifier);
+
     printf("Points inserted in RTree:\n(%f %f)\n",coordinates[0],coordinates[1]);
     printf("(%f %f)\n",coordinates2[0],coordinates2[1]);
     printf("(%f %f)\n",coordinates3[0],coordinates3[1]);
@@ -490,3 +494,4 @@ int main()
 
     return 0;
 }
+*/
