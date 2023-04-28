@@ -2,6 +2,7 @@
 #include<stdbool.h>
 #include<string.h>
 #include<stdio.h>
+#include<math.h>
 /*Libraries to include above this*/
 
 #define dim 2               //number of dimensions = 2
@@ -93,7 +94,7 @@ Data createDataItem(float coordinates[dim],char* tupleIdentifier)
 
 Node createNewNode(NodeType type,int entryCount,Entry entries[])    //called implicitly while creating leaf or internal node
 {
-    if(entryCount>M || entryCount<=0)
+    if(entryCount>M || entryCount<0)
         return NULL;
 
     Node node = (Node) malloc(sizeof(struct node));

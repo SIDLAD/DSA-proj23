@@ -1,5 +1,5 @@
 #include "RTree.c"
-
+//TODO: calcSplitDimension and objectIndexNearSplitDim
 typedef struct linkedList* LinkedList;
 typedef struct linkedNode* LinkedNode;
 /*All typedefs above this*/
@@ -10,11 +10,13 @@ bool updateMBR(Node parent,Entry newChild);
 
 RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
 Node ChooseLeaf(Data dataEntry,RTree rtree);
-bool AdjustTree(Node node1, Node node2);                                //node2 is null if original node was not split
+bool AdjustTree(RTree rtree,Node node1, Node node2);                                //node2 is null if original node was not split
 
 Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
 void calcCovRect(float answer[dim],Entry entry);
 int calcGroup(float objRect[dim],float covRect[dim]);
+int calcSplitDimension(Entry C[1<<dim][M],int countC[1<<dim]);
+int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim);
 
 LinkedList createNewLinkedList();
 LinkedList addToLinkedList(Data data, LinkedList list);
@@ -102,7 +104,7 @@ RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtre
     {
         updateMBR(node,(Entry)dataEntry);
     }
-    AdjustTree(node,nodeNewOnSplit);                                //updateMBR of ancestors will happen in AdjustTree
+    AdjustTree(rtree,node,nodeNewOnSplit);                                //updateMBR of ancestors will happen in AdjustTree
     return rtree;
 }
 
@@ -131,7 +133,7 @@ Node ChooseLeaf(Data dataEntry,RTree rtree)
     return node;
 }
 
-bool AdjustTree(Node node1, Node node2)                                //node2 is null if original node was not split
+bool AdjustTree(RTree rtree, Node node1, Node node2)                                //node2 is null if original node was not split
 {
     while(!isRoot(node1))
     {
@@ -152,6 +154,12 @@ bool AdjustTree(Node node1, Node node2)                                //node2 i
             node2 = parentNewOnSplit;
         }
     }
+    if(node2 != NULL)
+    {
+        Node children[2] = {node1,node2};
+        Node newRoot = createNewInternalNode(2,children);
+        rtree->root = newRoot;
+    }
     return true;
 }
 
@@ -171,8 +179,72 @@ Node CBSSplitNode(Node node)                                            //node t
         countC[group]++;
     }
 
-    //incomplete
-    return NULL;
+    int splitDim = calcSplitDimension(C,countC);
+
+    Entry _e[] = {NULL}; 
+    Node temp1 = createNewNode(! node->isLeaf,0,_e);
+    Node temp2 = createNewNode(! node->isLeaf,0,_e);
+
+    for(int i=0;i<(1<<dim);i++)
+    {
+        if(i&(1<<i))
+        {
+            for(int j=0;j<countC[i];j++)
+            {
+                temp2->entries[temp2->entryCount] = C[i][j];
+                temp2->entryCount++;
+            }
+        }
+        else
+        {
+            for(int j=0;j<countC[i];j++)
+            {
+                temp1->entries[temp1->entryCount] = C[i][j];
+                temp1->entryCount++;
+            }
+        }
+    }
+    if(temp1->entryCount<temp2->entryCount)
+    {
+            Node swap = temp1;
+            temp1 = temp2;
+            temp2 = swap;
+    }                                           //after this, temp1 will have more or equal number of entries as temp2
+
+    while(temp2->entryCount<m)
+    {
+         
+        int index1 = objectIndexNearSplitDim(temp1,covRect,splitDim);
+        Entry move = temp1->entries[index1];
+
+        temp1->entries[index1] = temp1->entries[temp1->entryCount - 1];
+        temp1->entries[temp1->entryCount - 1] = NULL;
+        temp2->entries[temp2->entryCount] = move;
+
+        temp1->entryCount--;
+        temp2->entryCount++;
+        
+    }
+
+    defineMBR(temp1);
+    defineMBR(temp2);
+    
+    *node = *temp1;
+    free(temp1);
+    
+    return temp2;
+}
+
+
+int calcSplitDimension(Entry C[1<<dim][M],int countC[1<<dim])
+{
+    printf("calcsplitdimension is incomplete\n");
+    return 0;
+}
+int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim)
+{
+    printf("objectindexnearsplitdim is incomplete\n");
+    return 0;
 }
 
 void calcCovRect(float covRect[dim],Entry entry)
@@ -266,11 +338,10 @@ bool overlaps(float I[2][dim],float S[2][dim])
     return isOverlap;                               //else I and S overlap
 }
 
-/*
+
 //For debugging purposes://
 int main()
 {
-    
     printf("hello working world\n");
 
     RTree rtree = createNewRTree();
@@ -312,16 +383,16 @@ int main()
     float covRect[dim];
     calcCovRect(covRect,(Entry)rtree->root);
 
-    /*
-            Groups are numbered via bit-masking. For 2 dimensions, the numbers would be like this:
-            ===========
-            |2   |   3|
-            |    |    |
-            |---------|
-            |    |    |  
-            |0   |   1|
-            ===========
-    */
+    
+    // Groups are numbered via bit-masking. For 2 dimensions, the numbers would be like this:
+    // ===========
+    // |2   |   3|
+    // |    |    |
+    // |---------|
+    // |    |    |  
+    // |0   |   1|
+    // ===========
+    
     printf("Group number of (1,0): %d\n",calcGroup(coordinates,covRect));
     printf("Group number of (2,3): %d\n",calcGroup(coordinates2,covRect));
     printf("Group number of (1,8): %d\n",calcGroup(coordinates3,covRect));
@@ -330,4 +401,3 @@ int main()
 
     return 0;
 }
-*/
