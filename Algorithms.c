@@ -419,7 +419,7 @@ bool overlaps(float I[2][dim],float S[2][dim])
     return isOverlap;                               //else I and S overlap
 }
 
-
+/*
 //For debugging purposes://
 int main()
 {
@@ -448,7 +448,6 @@ int main()
     InsertNewDataEntry(coordinates8,NULL,rtree);
     InsertNewDataEntry(coordinates9,NULL,rtree);
 
-    /*
     float searchQuery[2][dim] = {6,5,6,5};
     printf("Search tupleIdentifier at (6,5) : %s\n",search(rtree,searchQuery)->start->data->tupleIdentifier);
 
