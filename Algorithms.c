@@ -165,7 +165,7 @@ bool AdjustTree(RTree rtree, Node node1, Node node2)                            
 
 Node CBSSplitNode(Node node)                                            //node that is going to be split will TEMPORARILY have M+1 entries
 {                                                                       //this function will also defineMBR of the split nodes
-    Entry C[1<<dim][M];                                                 //using the concept of bit-masking to implement n-dimensional CBS Algorithm
+    Entry C[1<<dim][M+1];                                               //using the concept of bit-masking to implement n-dimensional CBS Algorithm
     int countC[1<<dim] = {};                                            // = {} initialises all values in int array with 0
 
     float covRect[dim];
