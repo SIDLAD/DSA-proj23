@@ -168,7 +168,9 @@ else{
 			fillcont(r,C3[i],u[1]);
 	}
 	//else should come here, see the paper //TODO: should implement tiebreak conditions of least overlap and least total coverage area.
-
+	else{
+		
+	}
 
 		
 }
@@ -314,7 +316,7 @@ cont chooseLeaf(cont temp,Node point){
 		t=tmp->arr[i];
 
 
-		area=(t->I[1][0]-t->I[0][0])+(t->I[1][1]-t->I[0][1]);
+		area=(t->I[1][0]-t->I[0][0])*(t->I[1][1]-t->I[0][1]);
 		if(t->I[0][0]<=point->I[0][0] && t->I[1][0]>=point->I[0][0]){
 				if(t->I[0][1]<=point->I[0][1] && t->I[1][1]>=point->I[0][1])
 					tmp_inc=0.0;
