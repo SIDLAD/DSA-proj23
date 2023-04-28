@@ -6,13 +6,15 @@ typedef struct linkedNode* LinkedNode;
 float calculateArea(Entry E1);
 float calculateCombinedArea(Entry E1, Entry E2);
 
-bool updateMBR(Node parent,Node newChild);
+bool updateMBR(Node parent,Entry newChild);
 
 RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
 Node ChooseLeaf(Data dataEntry,RTree rtree);
-bool AdjustTree(Node node1, Node node2);                               //node2 is null if original node was not split
+bool AdjustTree(Node node1, Node node2);                                //node2 is null if original node was not split
+
 Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
 void calcCovRect(float answer[dim],Entry entry);
+int calcGroup(float objRect[dim],float covRect[dim]);
 
 LinkedList createNewLinkedList();
 LinkedList addToLinkedList(Data data, LinkedList list);
@@ -65,14 +67,14 @@ float calculateCombinedArea(Entry E1, Entry E2)
     return area;
 }
 
-bool updateMBR(Node parent,Node newChild)
+bool updateMBR(Node parent,Entry newEntry)
 {
     for(int i=0;i<dim;i++)
     {
-        if(parent->I[0][i] > newChild->I[0][i])
-            parent->I[0][i] = newChild->I[0][i];
-        if(parent->I[1][i] < newChild->I[1][i])
-            parent->I[1][i] = newChild->I[1][i];
+        if(parent->I[0][i] > newEntry->I[0][i])
+            parent->I[0][i] = newEntry->I[0][i];
+        if(parent->I[1][i] < newEntry->I[1][i])
+            parent->I[1][i] = newEntry->I[1][i];
     }
     return true;
 }
@@ -96,7 +98,10 @@ RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtre
     {
         nodeNewOnSplit = CBSSplitNode(node);                        //returns the new node (the second one) that is created on splitting
     }
-
+    else
+    {
+        updateMBR(node,(Entry)dataEntry);
+    }
     AdjustTree(node,nodeNewOnSplit);                                //updateMBR of ancestors will happen in AdjustTree
     return rtree;
 }
@@ -131,12 +136,12 @@ bool AdjustTree(Node node1, Node node2)                                //node2 i
     while(!isRoot(node1))
     {
         Node parent = node1->parent;
-        updateMBR(parent,node1);
+        updateMBR(parent,(Entry)node1);
         if(node2 != NULL)
         {
             parent->entries[parent->entryCount] = (Entry)node2;
             parent->entryCount++;
-            updateMBR(parent,node2);
+            updateMBR(parent,(Entry)node2);
 
             Node parentNewOnSplit = NULL;
             if(parent->entryCount > M)
@@ -152,7 +157,8 @@ bool AdjustTree(Node node1, Node node2)                                //node2 i
 
 Node CBSSplitNode(Node node)                                            //node that is going to be split will TEMPORARILY have M+1 entries
 {                                                                       //this function will also defineMBR of the split nodes
-    //using the concept of bit-masking to implement n-dimensional CBS Algorithm
+    Entry C[1<<dim][M];                                                 //using the concept of bit-masking to implement n-dimensional CBS Algorithm
+    int countC[1<<dim] = {};                                            // = {} initialises all values in int array with 0
 
     float covRect[dim];
     calcCovRect(covRect,(Entry)node);
@@ -160,7 +166,9 @@ Node CBSSplitNode(Node node)                                            //node t
     {
         float objRect[dim];
         calcCovRect(objRect,node->entries[i]);
-
+        int group = calcGroup(objRect,covRect);
+        C[group][countC[group]] = node->entries[i];
+        countC[group]++;
     }
 
     //incomplete
@@ -174,6 +182,20 @@ void calcCovRect(float covRect[dim],Entry entry)
         covRect[i] = (entry->I[0][i] + entry->I[1][i])/2;
     }
 }
+
+int calcGroup(float objRect[dim],float covRect[dim])                    //calculating group number using the concept of bit-masking
+{
+    int group = 0;
+    for(int i=0;i<dim;i++)
+    {
+        if(objRect[i]>covRect[i])
+        {
+            group += 1<<i;
+        }
+    }
+    return group;
+}
+
 
 LinkedList createNewLinkedList()
 {
@@ -255,10 +277,10 @@ int main()
 
     float coordinates[dim] = {1,0};
     float coordinates2[dim] = {2,3};
-    float coordinates3[dim] = {1,9};
+    float coordinates3[dim] = {1,8};
     float coordinates4[dim] = {-1,8.9};
     float coordinates5[dim] = {6,5};
-
+    float coordinates6[dim] = {8,9};
     
     InsertNewDataEntry(coordinates,"DaBomb",rtree);
     InsertNewDataEntry(coordinates2,"Data2",rtree);
@@ -274,13 +296,18 @@ int main()
     float S[2][dim] = {{1,0},{5,6}};
     LinkedList list = search(rtree,S);
 
-    printf("\nLet's print the search results' list(nodes contained from x=1 to 5 and y=0 to 6):\n");
+    printf("\nLet's print the search results' list(data contained from x=1 to 5 and y=0 to 6):\n");
     LinkedNode linkedNode = list->start;
     for(int i=0;i<list->count;i++)
     {
         printf("%s(%f %f)\n",linkedNode->data->tupleIdentifier,linkedNode->data->coordinates[0],linkedNode->data->coordinates[1]);
         linkedNode = linkedNode->next;
     }
+
+    Entry e = (Entry)createDataItem(coordinates6,"DaBomb6");
+    float covRect[dim];
+    calcCovRect(covRect,e);
+
     return 0;
 }
 */

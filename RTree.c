@@ -83,7 +83,10 @@ Data createDataItem(float coordinates[dim],char* tupleIdentifier)
     }
 
     data->tupleIdentifier = (char*)malloc(sizeof(tupleIdentifier));
-    strcpy(data->tupleIdentifier,tupleIdentifier);
+    if(tupleIdentifier !=NULL)
+        strcpy(data->tupleIdentifier,tupleIdentifier);
+    else
+        strcpy(data->tupleIdentifier,"");
 
     return data;
 }
