@@ -139,7 +139,6 @@ bool AdjustTree(RTree rtree, Node node1, Node node2)                            
     {
         Node parent = node1->parent;
         Node parentNewOnSplit = NULL;
-
         updateMBR(parent,(Entry)node1);
         if(node2 != NULL)
         {
@@ -180,7 +179,7 @@ Node CBSSplitNode(Node node)                                            //node t
         countC[group]++;
     }
 
-    int splitDim = chooseSplitDimension(C,countC);
+    int splitDim = chooseSplitDimension(C,countC);                      //make sure to ignore entries in C where countC = 0
 
     Entry _e[] = {NULL}; 
     Node temp1 = createNewNode(! node->isLeaf,0,_e);
@@ -227,6 +226,7 @@ Node CBSSplitNode(Node node)                                            //node t
         
     }
 
+    temp2->parent = temp1->parent = node->parent;
     defineMBR(temp1);
     defineMBR(temp2);
     
