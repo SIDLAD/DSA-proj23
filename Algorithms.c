@@ -1,5 +1,8 @@
+//TODO: Neatify code
 #include "RTree.c"
-//TODO: calcSplitDimension and objectIndexNearSplitDim
+#include <limits.h> //to be removed
+#include<float.h>   //to be removed
+
 typedef struct linkedList* LinkedList;
 typedef struct linkedNode* LinkedNode;
 /*All typedefs above this*/
@@ -15,7 +18,8 @@ bool AdjustTree(RTree rtree,Node node1, Node node2);                            
 Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
 void calcCovRect(float answer[dim],Entry entry);
 int calcGroup(float objRect[dim],float covRect[dim]);
-int chooseSplitDimension(Entry C[1<<dim][M],int countC[1<<dim]);
+int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim]);
+float calculateOverlap(Node node1, Node node2);   //calculate sthe extent of overlap between two nodes
 int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim);
 
 LinkedList createNewLinkedList();
@@ -185,7 +189,7 @@ Node CBSSplitNode(Node node)                                            //node t
     Node temp1 = createNewNode(! node->isLeaf,0,_e);
     Node temp2 = createNewNode(! node->isLeaf,0,_e);
 
-    for(int i=0;i<(1<<dim);i++)
+    for(int i=0;i<(1<<dim);i++)     //10110 & 100
     {
         if(i&(1<<splitDim))
         {
@@ -235,15 +239,93 @@ Node CBSSplitNode(Node node)                                            //node t
 }
 
 
-int chooseSplitDimension(Entry C[1<<dim][M],int countC[1<<dim])
+int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim])
 {
-    printf("choosesplitdimension is incomplete\n");
-    return 0;
+    int splitDim=0;
+    int minDif=INT_MAX;
+    float overlap=FLT_MAX;
+    float area=FLT_MAX;
+    for (int k=0;k<dim;k++){
+        int kDif;
+        Entry _e[] = {NULL}; 
+        Node temp1 = createNewNode(0,0,_e);
+        Node temp2 = createNewNode(0,0,_e);
+        for(int i=0;i<(1<<dim);i++){
+            if(i&(1<<k))
+            {
+                for(int j=0;j<countC[i];j++)
+                {
+                    temp2->entries[temp2->entryCount] = C[i][j];
+                    temp2->entryCount++;
+                }
+            }
+            else
+            {
+                for(int j=0;j<countC[i];j++)
+                {
+                    temp1->entries[temp1->entryCount] = C[i][j];
+                    temp1->entryCount++;
+                }
+            }
+        }
+        defineMBR(temp1);
+        defineMBR(temp2);
+        kDif=abs(temp1->entryCount - temp2->entryCount);
+        float kOverlap=calculateOverlap(temp1,temp2);//check overlap by creating a new function that checks if obj is part of
+        float kArea=calculateArea((Entry)temp1)+calculateArea((Entry)temp2);
+        if(kDif<minDif){
+            splitDim=k;
+            minDif=kDif;
+            overlap=kOverlap;
+            area=kArea;
+        }
+        else if(kDif==minDif){
+            if(kOverlap<overlap){
+                splitDim=k;
+                minDif=kDif;
+                overlap=kOverlap;
+                area=kArea;
+            }
+            else if(kOverlap==overlap){
+                if(area>kArea){
+                    splitDim=k;
+                    minDif=kDif;
+                    overlap=kOverlap;
+                    area=kArea;                
+                }
+            }
+        }
+        free(temp1);
+        free(temp2); 
+    }
+    return splitDim;
+}
+
+float calculateOverlap(Node node1, Node node2){   //calculate sthe extent of overlap between two nodes
+    float overlap=1;
+    for (int i=0;i<dim;i++){
+        float max_min=node1->I[0][i]>node2->I[0][i]? node1->I[0][i]:node2->I[0][i];
+        float min_max=node1->I[1][i]<node2->I[1][i]? node1->I[1][i]:node2->I[1][i];
+        overlap*=max_min-min_max;
+        if(overlap<=0){
+            overlap=0;
+            break;
+        }
+    }
+    return overlap;
 }
 int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim)
 {
-    printf("objectindexnearsplitdim is incomplete\n");
-    return 0;
+    int index=-1;
+    float dist=FLT_MAX;
+    for(int i=0;i<node->entryCount;i++){
+        float iDist=abs((node->entries[i]->I[0][splitDim]+node->entries[i]->I[1][splitDim])/2 -covRect[splitDim]);
+        if (iDist<dist){
+            index=i;
+            dist=iDist;
+        }
+    }
+    return index;
 }
 
 void calcCovRect(float covRect[dim],Entry entry)
@@ -337,7 +419,7 @@ bool overlaps(float I[2][dim],float S[2][dim])
     return isOverlap;                               //else I and S overlap
 }
 
-/*
+
 //For debugging purposes://
 int main()
 {
@@ -408,4 +490,3 @@ int main()
 
     return 0;
 }
-*/
