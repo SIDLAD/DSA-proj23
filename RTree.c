@@ -1,5 +1,3 @@
-
-//TODO: implement insert for non-leaf node which requires search-leaf function,
 //TODO:  and implement overflow for non-root node. Then it's done max ~3 hrs work.
 
 //This is clearly a better version than the one we theorized and with implementation of the above 2 TODOs, our assignment is over.
@@ -134,6 +132,7 @@ else{
 		counter_c0++;
 	}
 }
+
 }
 
 cont u[2];
@@ -189,16 +188,17 @@ return new;
 
 void updateMBR(cont par_co, Node par, cont curr){
 
-    for(int i=0;i<curr->size;i++)
+    for(int i=0;i<2;i++)
     {
-        if(par->I[0][i] > curr->I[0][i]){
+        if(par_co->I[0][i] > curr->I[0][i]){
             par->I[0][i] = curr->I[0][i];
             par_co->I[0][i] = curr->I[0][i];
             }
-        if(par->I[1][i] < curr->I[1][i]){
+        if(par_co->I[1][i] < curr->I[1][i]){
             par->I[1][i] = curr->I[1][i];
             par_co->I[1][i] = curr->I[1][i];}
     }
+    
     
 }
 
@@ -217,47 +217,33 @@ if(tmp->arr[0]->parent==NULL){
 	r->Root=new;
 	assignchild(new_root_1,new,u0);
 	assignchild(new_root_2,new,u1);
-
+	free(tmp);
 
 }
 
 else{
+printf("hi\n");
+	if(u0->arr[0]->parent==NULL)
+		printf("adfef\n");
 	(u0->arr[0]->parent)->I[0][0]=u0->I[0][0];
 	(u0->arr[0]->parent)->I[0][1]=u0->I[0][1];
 	(u0->arr[0]->parent)->I[1][0]=u0->I[1][0];
 	(u0->arr[0]->parent)->I[1][1]=u0->I[1][1];
-	
-	for(int i=0;i<(tmp->size)-1;i++){
-	Node node=tmp->arr[i];
-	for(int j=0;j<2;j++){
-	if(tmp->I[0][0]>node->I[j][0]){
-		tmp->I[0][0]=node->I[j][0];
-	}
-	if(tmp->I[1][0]<node->I[j][0]){
-		tmp->I[1][0]=node->I[j][0];
-	}
-	if(tmp->I[0][1]>node->I[j][1]){
-		tmp->I[0][1]=node->I[j][1];
-	}
-	if(tmp->I[1][1]<node->I[j][1]){
-		tmp->I[1][1]=node->I[j][1];
-	}	
-	}
-	}
-
+	printf("his\n");
 	Node new_tmp = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
 	assignchild(new_tmp,tmp->arr[0]->par_cont,u1);
 	tmp->arr[0]->par_cont->arr[tmp->arr[0]->par_cont->size]=new_tmp;
 	tmp->arr[0]->par_cont->size++;
-	cont x=tmp->arr[0]->par_cont;
-	Node y=tmp->arr[0]->parent;
-	cont curr=tmp;
+	cont x=u1->arr[0]->par_cont;
+	Node y=u1->arr[0]->parent;
+	cont curr=u1;
 	while( x!=NULL && y!=NULL){
 		updateMBR(x,y,curr);
 		x=x->arr[0]->par_cont;
 		y=tmp->arr[0]->parent;
 		curr=x;
 		}
+	printf("hi\n");
 	if(tmp->arr[0]->par_cont->size==M+1)
 	overflow(r, tmp->arr[0]->par_cont);	
 	free(tmp);
@@ -366,7 +352,7 @@ cont chooseLeaf(cont temp,Node point){
 
 
 	tmp=tmp->arr[tmp_i]->child;
-	printf("tmpinc: %d \n",tmp_i);
+	printf("tmpinc: %f \n",tmp_increase);
 	
 	}
 
@@ -409,6 +395,8 @@ for(int j=0;j<2;j++){
 		tmp->I[1][1]=node->I[j][1];
 	}	
 }
+tmp->arr[tmp->size-1]->parent=tmp->arr[0]->parent;
+tmp->arr[tmp->size-1]->par_cont=tmp->arr[0]->par_cont;
 }
 
 if(r->Root==NULL)
@@ -426,9 +414,7 @@ while( x!=NULL && y!=NULL){
 
 
 if(tmp->size==(M+1)){
-
 overflow(r,tmp);
-
 }
 }
 
@@ -466,6 +452,6 @@ int main()
         printf("h insert:%d\n",rt->Root->isLeaf);
         printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
     fillcont(rt,h, rt->Root);
-    printf("%f, %f, %f, %f \n", rt->Root->arr[1]->I[0][0],rt->Root->arr[1]->I[0][1],rt->Root->arr[1]->I[1][0],rt->Root->arr[1]->I[1][1]);
+    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
     return 0;
 }
