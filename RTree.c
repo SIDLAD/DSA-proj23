@@ -28,6 +28,7 @@ Node createNewLeafNode(int entryCount,Data dataEntries[]);
 Node createNewInternalNode(int entryCount,Node nodeEntries[]);
 bool defineMBR(Node node);
 int nodeLevel(Node node);
+int nodeHeight(Node node);
 bool isRoot(Node node);
 /*Function declarations above this*/
 
@@ -161,6 +162,17 @@ int nodeLevel(Node node)
         node = (Node)node->entries[0];
     }
     return level;
+}
+
+int nodeHeight(Node node)
+{
+    int height = 0;
+    while(!isRoot(node))
+    {
+        height++;
+        node = node->parent;
+    }
+    return height;
 }
 
 bool isRoot(Node node)
