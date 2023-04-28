@@ -15,7 +15,7 @@ bool AdjustTree(RTree rtree,Node node1, Node node2);                            
 Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
 void calcCovRect(float answer[dim],Entry entry);
 int calcGroup(float objRect[dim],float covRect[dim]);
-int calcSplitDimension(Entry C[1<<dim][M],int countC[1<<dim]);
+int chooseSplitDimension(Entry C[1<<dim][M],int countC[1<<dim]);
 int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim);
 
 LinkedList createNewLinkedList();
@@ -138,6 +138,8 @@ bool AdjustTree(RTree rtree, Node node1, Node node2)                            
     while(!isRoot(node1))
     {
         Node parent = node1->parent;
+        Node parentNewOnSplit = NULL;
+
         updateMBR(parent,(Entry)node1);
         if(node2 != NULL)
         {
@@ -145,14 +147,13 @@ bool AdjustTree(RTree rtree, Node node1, Node node2)                            
             parent->entryCount++;
             updateMBR(parent,(Entry)node2);
 
-            Node parentNewOnSplit = NULL;
             if(parent->entryCount > M)
             {
                 parentNewOnSplit = CBSSplitNode(parent);
             }
-            node1 = parent;
-            node2 = parentNewOnSplit;
         }
+        node1 = parent;
+        node2 = parentNewOnSplit;
     }
     if(node2 != NULL)
     {
@@ -179,7 +180,7 @@ Node CBSSplitNode(Node node)                                            //node t
         countC[group]++;
     }
 
-    int splitDim = calcSplitDimension(C,countC);
+    int splitDim = chooseSplitDimension(C,countC);
 
     Entry _e[] = {NULL}; 
     Node temp1 = createNewNode(! node->isLeaf,0,_e);
@@ -236,9 +237,9 @@ Node CBSSplitNode(Node node)                                            //node t
 }
 
 
-int calcSplitDimension(Entry C[1<<dim][M],int countC[1<<dim])
+int chooseSplitDimension(Entry C[1<<dim][M],int countC[1<<dim])
 {
-    printf("calcsplitdimension is incomplete\n");
+    printf("choosesplitdimension is incomplete\n");
     return 0;
 }
 int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim)
@@ -352,12 +353,20 @@ int main()
     float coordinates4[dim] = {-1,8.9};
     float coordinates5[dim] = {6,5};
     float coordinates6[dim] = {8,9};
+    float coordinates7[dim] = {8,9};
+    float coordinates8[dim] = {10,11};
+    float coordinates9[dim] = {0,0};
+
     
     InsertNewDataEntry(coordinates,"DaBomb",rtree);
     InsertNewDataEntry(coordinates2,"Data2",rtree);
     InsertNewDataEntry(coordinates3,"Data3",rtree);
     InsertNewDataEntry(coordinates4,"Data4",rtree);
     InsertNewDataEntry(coordinates5,"Data5",rtree);
+    InsertNewDataEntry(coordinates6,NULL,rtree);
+    InsertNewDataEntry(coordinates7,NULL,rtree);
+    InsertNewDataEntry(coordinates8,NULL,rtree);
+    InsertNewDataEntry(coordinates9,NULL,rtree);
 
     printf("Points inserted in RTree:\n(%f %f)\n",coordinates[0],coordinates[1]);
     printf("(%f %f)\n",coordinates2[0],coordinates2[1]);
