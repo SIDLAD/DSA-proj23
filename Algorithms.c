@@ -304,9 +304,29 @@ int main()
         linkedNode = linkedNode->next;
     }
 
-    Entry e = (Entry)createDataItem(coordinates6,"DaBomb6");
+    printf("\nrtree MBR is: (%f %f) to (%f %f)\n",rtree->root->I[0][0],rtree->root->I[0][1],rtree->root->I[1][0],rtree->root->I[1][1]);
+
+    // float objRect[dim];
+    // calcCovRect(objRect,(Entry)coordinates);
+
     float covRect[dim];
-    calcCovRect(covRect,e);
+    calcCovRect(covRect,(Entry)rtree->root);
+
+    /*
+            Groups are numbered via bit-masking. For 2 dimensions, the numbers would be like this:
+            ===========
+            |2   |   3|
+            |    |    |
+            |---------|
+            |    |    |  
+            |0   |   1|
+            ===========
+    */
+    printf("Group number of (1,0): %d\n",calcGroup(coordinates,covRect));
+    printf("Group number of (2,3): %d\n",calcGroup(coordinates2,covRect));
+    printf("Group number of (1,8): %d\n",calcGroup(coordinates3,covRect));
+    printf("Group number of (-1.8.9): %d\n",calcGroup(coordinates4,covRect));
+    printf("Group number of (6,5): %d\n\n",calcGroup(coordinates5,covRect));
 
     return 0;
 }
