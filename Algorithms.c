@@ -213,7 +213,6 @@ Node CBSSplitNode(Node node)                                            //node t
 
     while(temp2->entryCount<m)
     {
-         
         int index1 = objectIndexNearSplitDim(temp1,covRect,splitDim);
         Entry move = temp1->entries[index1];
 
@@ -223,7 +222,6 @@ Node CBSSplitNode(Node node)                                            //node t
 
         temp1->entryCount--;
         temp2->entryCount++;
-        
     }
 
     temp2->parent = temp1->parent = node->parent;
@@ -339,7 +337,7 @@ bool overlaps(float I[2][dim],float S[2][dim])
     return isOverlap;                               //else I and S overlap
 }
 
-
+/*
 //For debugging purposes://
 int main()
 {
@@ -410,3 +408,4 @@ int main()
 
     return 0;
 }
+*/
