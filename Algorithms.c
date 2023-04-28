@@ -187,7 +187,7 @@ Node CBSSplitNode(Node node)                                            //node t
 
     for(int i=0;i<(1<<dim);i++)
     {
-        if(i&(1<<i))
+        if(i&(1<<splitDim))
         {
             for(int j=0;j<countC[i];j++)
             {
