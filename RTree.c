@@ -259,7 +259,41 @@ else{
 			}
 		}
 	}
-	//TODO: have to implement the case when less than m number of nodes are present in node. see CBS paper.
+	//implemented the case when less than m number of nodes are present in node. see CBS paper.
+	if(u[0]->size<m){
+		int tmp_var=0;
+		float x=(u[0]->I[0][0]+u[0]->I[1][0])/2, y=(u[0]->I[0][1]+u[0]->I[1][1])/2;
+		float tmp_dist=powf(((u[1]->arr[0]->I[0][0]+u[1]->arr[0]->I[1][0])/2-x),2)+powf(((u[1]->arr[0]->I[0][1]+u[1]->arr[0]->I[1][1])/2-y),2);
+		for(int i=1;i<u[1]->size;i++){
+			float temp_area=(powf(((u[1]->arr[i]->I[0][0]+u[1]->arr[i]->I[1][0])/2-x),2)+powf(((u[1]->arr[i]->I[0][1]+u[1]->arr[i]->I[1][1])/2-y),2));
+			if(tmp_dist>temp_area)
+			{	tmp_dist=temp_area;
+				tmp_var=i;
+				
+			}
+		}
+		u[0]->arr[u[0]->size]=u[1]->arr[tmp_var];
+		u[1]->arr[tmp_var]=NULL;
+		u[1]->size--;
+			
+	}
+	if(u[1]->size<m){
+		int tmp_var=0;
+		float x=(u[1]->I[0][0]+u[1]->I[1][0])/2, y=(u[1]->I[0][1]+u[1]->I[1][1])/2;
+		float tmp_dist=powf(((u[0]->arr[0]->I[0][0]+u[0]->arr[0]->I[1][0])/2-x),2)+powf(((u[0]->arr[0]->I[0][1]+u[0]->arr[0]->I[1][1])/2-y),2);
+		for(int i=1;i<u[0]->size;i++){
+			float temp_area=(powf(((u[0]->arr[i]->I[0][0]+u[0]->arr[i]->I[1][0])/2-x),2)+powf(((u[0]->arr[i]->I[0][1]+u[0]->arr[i]->I[1][1])/2-y),2));
+			if(tmp_dist>temp_area)
+			{	tmp_dist=temp_area;
+				tmp_var=i;
+				
+			}
+		}
+		u[1]->arr[u[1]->size]=u[0]->arr[tmp_var];
+		u[0]->arr[tmp_var]=NULL;
+		u[0]->size--;
+			
+	}
 	
 }
 if(u[0]->arr[0]->child!=NULL){
@@ -541,6 +575,13 @@ int main()
     Node l= createNewNode(8,15,8,15);
     Node mo= createNewNode(8,14,8,14);
     Node n= createNewNode(7,15,7,15);
+    Node o= createNewNode(9,14,9,14);
+    Node p= createNewNode(9,15,9,15);
+    Node q= createNewNode(9,16,9,16);
+    Node r= createNewNode(9,17,9,17);
+    Node s= createNewNode(12,17,12,17);
+    Node t= createNewNode(11,18,11,18);
+    Node u= createNewNode(1,20,1,20);
     cont first=createcont(1);
     RTree rt = createNewRTree();
     fillcont(rt,a, first);
@@ -561,7 +602,14 @@ int main()
     fillcont(rt,l, rt->Root);
     fillcont(rt,mo, rt->Root);
     fillcont(rt,n, rt->Root);
+    fillcont(rt,o, rt->Root);
+    fillcont(rt,p, rt->Root);
+    fillcont(rt,q, rt->Root);
+    fillcont(rt,r, rt->Root);
+    fillcont(rt,s, rt->Root);
+    fillcont(rt,t, rt->Root);
+    fillcont(rt,u, rt->Root);
     printf("%f, %f, %f, %f \n", rt->Root->I[0][0],rt->Root->I[0][1],rt->Root->I[1][0],rt->Root->I[1][1]);
-    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
+    printf("%f, %f, %f, %f \n", rt->Root->arr[2]->I[0][0],rt->Root->arr[2]->I[0][1],rt->Root->arr[2]->I[1][0],rt->Root->arr[2]->I[1][1]);
     return 0;
 }
