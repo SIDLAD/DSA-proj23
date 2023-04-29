@@ -228,6 +228,14 @@ Node CBSSplitNode(Node node)                                            //node t
         temp2->entryCount++;
     }
 
+    if(! temp2->isLeaf)
+    {
+        for(int i=0;i<temp2->entryCount;i++)
+        {
+            ((Node)temp2->entries[i])->parent = temp2;
+        }
+    }
+
     temp2->parent = temp1->parent = node->parent;
     defineMBR(temp1);
     defineMBR(temp2);
