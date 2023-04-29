@@ -314,7 +314,7 @@ float calculateOverlap(Node node1, Node node2){   //calculate sthe extent of ove
     for (int i=0;i<dim;i++){
         float max_min=node1->I[0][i]>node2->I[0][i]? node1->I[0][i]:node2->I[0][i];
         float min_max=node1->I[1][i]<node2->I[1][i]? node1->I[1][i]:node2->I[1][i];
-        overlap*=max_min-min_max;
+        overlap *= min_max - max_min;
         if(overlap<=0){
             overlap=0;
             break;
