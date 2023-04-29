@@ -261,6 +261,7 @@ else{
 	}
 	//implemented the case when less than m number of nodes are present in node. see CBS paper.
 	if(u[0]->size<m){
+		printf("uhuh876\n");
 		int tmp_var=0;
 		float x=(u[0]->I[0][0]+u[0]->I[1][0])/2, y=(u[0]->I[0][1]+u[0]->I[1][1])/2;
 		float tmp_dist=powf(((u[1]->arr[0]->I[0][0]+u[1]->arr[0]->I[1][0])/2-x),2)+powf(((u[1]->arr[0]->I[0][1]+u[1]->arr[0]->I[1][1])/2-y),2);
@@ -272,14 +273,18 @@ else{
 				
 			}
 		}
-		u[0]->arr[u[0]->size]=u[1]->arr[tmp_var];
+		fillcont(r,u[1]->arr[tmp_var],u[0]);
 		for(int i=tmp_var+1;i<u[1]->size;i++)
 			u[1]->arr[i-1]=u[1]->arr[i-1];
 		u[1]->arr[u[1]->size-1]=NULL;
 		u[1]->size--;
-		
+		cont tmp_container=createcont(1);
+		for(int i=0;i<u[1]->size;i++)
+			fillcont(r, u[1]->arr[i],tmp_container);
+		u[1]=tmp_container;
 	}
 	if(u[1]->size<m){
+		printf("6758789609jnlnklini\n");
 		int tmp_var=0;
 		float x=(u[1]->I[0][0]+u[1]->I[1][0])/2, y=(u[1]->I[0][1]+u[1]->I[1][1])/2;
 		float tmp_dist=powf(((u[0]->arr[0]->I[0][0]+u[0]->arr[0]->I[1][0])/2-x),2)+powf(((u[0]->arr[0]->I[0][1]+u[0]->arr[0]->I[1][1])/2-y),2);
@@ -291,11 +296,15 @@ else{
 				
 			}
 		}
-		u[1]->arr[u[1]->size]=u[0]->arr[tmp_var];
+		fillcont(r,u[0]->arr[tmp_var],u[1]);
 		for(int i=tmp_var+1;i<u[0]->size;i++)
 			u[0]->arr[i-1]=u[0]->arr[i-1];
 		u[0]->arr[u[0]->size-1]=NULL;
 		u[0]->size--;
+		cont tmp_container=createcont(1);
+		for(int i=0;i<u[0]->size;i++)
+			fillcont(r, u[0]->arr[i],tmp_container);
+		u[0]=tmp_container;
 			
 	}
 	
@@ -318,22 +327,22 @@ new.arr[1]=u[1];
 return new;
 }
 
-int updateMBR(cont par_co, Node par, cont curr){
+void updateMBR(cont par_co, Node par, cont curr){
     int val=0;
     for(int i=0;i<2;i++)
     {
-        if(par_co->I[0][i] > curr->I[0][i]){
+        if(par_co->I[0][i] > curr->I[0][i] || par->I[0][i] > curr->I[0][i]){
             par->I[0][i] = curr->I[0][i];
             par_co->I[0][i] = curr->I[0][i];
             val=1;
             }
-        if(par_co->I[1][i] < curr->I[1][i]){
+        if(par_co->I[1][i] < curr->I[1][i] || par->I[1][i] < curr->I[1][i]){
             par->I[1][i] = curr->I[1][i];
             par_co->I[1][i] = curr->I[1][i];
             val=1;}
+        printf("val1:----%f,%f,,....., %f,%f\n",curr->I[1][0],curr->I[1][1],par->I[1][0],par->I[1][1]);
     }
-    
-    return val;
+    printf("val:----%d\n",val);
 }
 
 
@@ -362,15 +371,13 @@ printf("hi\n");
 	(u0->arr[0]->parent)->I[0][1]=u0->I[0][1];
 	(u0->arr[0]->parent)->I[1][0]=u0->I[1][0];
 	(u0->arr[0]->parent)->I[1][1]=u0->I[1][1];
-	assignchild(tmp->arr[0]->parent,tmp->arr[0]->par_cont,u0);
+	assignchild(u0->arr[0]->parent,tmp->arr[0]->par_cont,u0);
 	Node new_tmp = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
 	assignchild(new_tmp,tmp->arr[0]->par_cont,u1);
-	bool tmp_leaf=u0->arr[0]->par_cont->isLeaf;
 	u0->arr[0]->par_cont->isLeaf=1;
-	fillcont(r, new_tmp, tmp->arr[0]->par_cont);
-	u0->arr[0]->par_cont->isLeaf=tmp_leaf;
-	
-	printf("sizezzdwfwe: %d\n", tmp->arr[0]->par_cont->size);
+	fillcont(r, new_tmp, u0->arr[0]->par_cont);
+	u0->arr[0]->par_cont->isLeaf=0;
+        printf("val1efr333:----%f,%f,,....., %f,%f\n",u1->I[1][0],u1->I[1][1],u1->arr[0]->parent->I[1][0],u1->arr[0]->parent->I[1][1]);
 
 	
 		
@@ -392,72 +399,72 @@ cont chooseLeaf(cont temp,Node point){
 	
 	cont tmp=temp;
 	float tmp_increase;
-	float area;
+	float perimeter;
 	float mbr;
 	int tmp_i;
 	float tmp_inc;
 	Node t;
 	float tmp_mbr;
 	while(tmp->isLeaf==0){
-	area=(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])*(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1]);
-	printf("perimeter: %f \n",area);
+	perimeter=(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])+(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1]);
+	printf("perimeter: %f \n",perimeter);
 	if(tmp->arr[0]->I[0][0]<=point->I[0][0] && tmp->arr[0]->I[1][0]>=point->I[0][0]){
 		if(tmp->arr[0]->I[0][1]<=point->I[0][1] && tmp->arr[0]->I[1][1]>=point->I[0][1])
 			tmp_increase=0.0;
 		else if(tmp->arr[0]->I[0][1]>=point->I[0][1])
-			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])*(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])-area;
+			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])+(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])-perimeter;
 		else
-			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])*(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])-area;
+			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])+(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])-perimeter;
 	}
 	else if(tmp->arr[0]->I[0][0]>=point->I[0][0]){
 		if(tmp->arr[0]->I[0][1]>=point->I[0][1])
-			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])*(tmp->arr[0]->I[1][0]-point->I[0][0])-area;
+			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])+(tmp->arr[0]->I[1][0]-point->I[0][0])-perimeter;
 		else if(tmp->arr[0]->I[0][1]<=point->I[0][1] && tmp->arr[0]->I[1][1]>=point->I[0][1])
-			tmp_increase=(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1])*(tmp->arr[0]->I[1][0]-point->I[0][0])-area;
+			tmp_increase=(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1])+(tmp->arr[0]->I[1][0]-point->I[0][0])-perimeter;
 		else
-			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])*(tmp->arr[0]->I[1][0]-point->I[0][0])-area;
+			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])+(tmp->arr[0]->I[1][0]-point->I[0][0])-perimeter;
 		}
 	else if(tmp->arr[0]->I[1][0]<=point->I[0][0]){
 				printf("zero\n");
 		if(tmp->arr[0]->I[0][1]>=point->I[0][1])
-			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])*(point->I[0][0]-tmp->arr[0]->I[0][0])-area;
+			tmp_increase=(tmp->arr[0]->I[1][1]-point->I[0][1])+(point->I[0][0]-tmp->arr[0]->I[0][0])-perimeter;
 		else if(tmp->arr[0]->I[0][1]<=point->I[0][1] && tmp->arr[0]->I[1][1]>=point->I[0][1])
-			tmp_increase=(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1])*(point->I[0][0]-tmp->arr[0]->I[0][0])-area;
+			tmp_increase=(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1])+(point->I[0][0]-tmp->arr[0]->I[0][0])-perimeter;
 		else
-			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])*(point->I[0][0]-tmp->arr[0]->I[0][0])-area;
+			tmp_increase=(point->I[0][1]-tmp->arr[0]->I[0][1])+(point->I[0][0]-tmp->arr[0]->I[0][0])-perimeter;
 		}
-	mbr=area;
+	mbr=(tmp->arr[0]->I[1][0]-tmp->arr[0]->I[0][0])*(tmp->arr[0]->I[1][1]-tmp->arr[0]->I[0][1]);
 	tmp_i=0;
 	for(int i=1;i<tmp->size;i++){
 		t=tmp->arr[i];
 
 
-		area=(t->I[1][0]-t->I[0][0])*(t->I[1][1]-t->I[0][1]);
+		perimeter=(t->I[1][0]-t->I[0][0])+(t->I[1][1]-t->I[0][1]);
 		if(t->I[0][0]<=point->I[0][0] && t->I[1][0]>=point->I[0][0]){
 				if(t->I[0][1]<=point->I[0][1] && t->I[1][1]>=point->I[0][1])
 					tmp_inc=0.0;
 				else if(t->I[0][1]>=point->I[0][1])
-					tmp_inc=((t->I[1][1]-point->I[0][1])*(t->I[1][0]-t->I[0][0]))-area;
+					tmp_inc=((t->I[1][1]-point->I[0][1])+(t->I[1][0]-t->I[0][0]))-perimeter;
 				else
-					tmp_inc=((point->I[0][1]-t->I[0][1])*(t->I[1][0]-t->I[0][0]))-area;
+					tmp_inc=((point->I[0][1]-t->I[0][1])+(t->I[1][0]-t->I[0][0]))-perimeter;
 		}	
 		else if(t->I[0][0]>=point->I[0][0]){
 			if(t->I[0][1]>=point->I[0][1])
-				tmp_inc=((t->I[1][1]-point->I[0][1])*(t->I[1][0]-point->I[0][0]))-area;
+				tmp_inc=((t->I[1][1]-point->I[0][1])+(t->I[1][0]-point->I[0][0]))-perimeter;
 			else if(t->I[0][1]<=point->I[0][1] && t->I[1][1]>=point->I[0][1])
-				tmp_inc=((t->I[1][1]-t->I[0][1])*(t->I[1][0]-point->I[0][0]))-area;
+				tmp_inc=((t->I[1][1]-t->I[0][1])+(t->I[1][0]-point->I[0][0]))-perimeter;
 			else
-				tmp_inc=((point->I[0][1]-t->I[0][1])*(t->I[1][0]-point->I[0][0]))-area;
+				tmp_inc=((point->I[0][1]-t->I[0][1])+(t->I[1][0]-point->I[0][0]))-perimeter;
 			}
 		else if(t->I[1][0]<=point->I[0][0]){
 			if(t->I[0][1]>=point->I[0][1])
-				tmp_inc=((t->I[1][1]-point->I[0][1])*(point->I[0][0]-t->I[0][0]))-area;
+				tmp_inc=((t->I[1][1]-point->I[0][1])+(point->I[0][0]-t->I[0][0]))-perimeter;
 			else if(t->I[0][1]<=point->I[0][1] && t->I[1][1]>=point->I[0][1])
-				tmp_inc=((t->I[1][1]-t->I[0][1])*(point->I[0][0]-t->I[0][0]))-area;
+				tmp_inc=((t->I[1][1]-t->I[0][1])+(point->I[0][0]-t->I[0][0]))-perimeter;
 			else
-				tmp_inc=((point->I[0][1]-t->I[0][1])*(point->I[0][0]-t->I[0][0]))-area;
+				tmp_inc=((point->I[0][1]-t->I[0][1])+(point->I[0][0]-t->I[0][0]))-perimeter;
 			}
-		tmp_mbr=area;
+		tmp_mbr=(t->I[1][0]-t->I[0][0])*(t->I[1][1]-t->I[0][1]);
 		if((tmp_inc)<(tmp_increase)){
 			tmp_i=i;
 			tmp_increase=(tmp_inc);
@@ -506,20 +513,36 @@ tmp->I[1][1]=node->I[1][1];
 }
 else{
 
-for(int j=0;j<2;j++){
-	if(tmp->I[0][0]>node->I[j][0]){
-		tmp->I[0][0]=node->I[j][0];
+
+	if(tmp->I[0][0]>node->I[0][0]){
+		tmp->I[0][0]=node->I[0][0];
+		if(tmp->arr[0]->parent!=NULL)
+		{
+			tmp->arr[0]->parent->I[0][0]=node->I[0][0];
+		}
 	}
-	if(tmp->I[1][0]<node->I[j][0]){
-		tmp->I[1][0]=node->I[j][0];
+	if(tmp->I[1][0]<node->I[1][0]){
+		tmp->I[1][0]=node->I[1][0];
+		if(tmp->arr[0]->parent!=NULL)
+		{
+			tmp->arr[0]->parent->I[1][0]=node->I[1][0];
+		}
 	}
-	if(tmp->I[0][1]>node->I[j][1]){
-		tmp->I[0][1]=node->I[j][1];
+	if(tmp->I[0][1]>node->I[0][1]){
+		tmp->I[0][1]=node->I[0][1];
+		if(tmp->arr[0]->parent!=NULL)
+		{
+			tmp->arr[0]->parent->I[0][1]=node->I[0][1];
+		}
 	}
-	if(tmp->I[1][1]<node->I[j][1]){
-		tmp->I[1][1]=node->I[j][1];
+	if(tmp->I[1][1]<node->I[1][1]){
+		tmp->I[1][1]=node->I[1][1];
+		if(tmp->arr[0]->parent!=NULL)
+		{
+			tmp->arr[0]->parent->I[1][1]=node->I[1][1];
+		}
 	}	
-}
+
 tmp->arr[tmp->size-1]->parent=tmp->arr[0]->parent;
 tmp->arr[tmp->size-1]->par_cont=tmp->arr[0]->par_cont;
 }
@@ -530,14 +553,15 @@ r->Root=tmp;
 cont x=tmp->arr[0]->par_cont;
 Node y=tmp->arr[0]->parent;
 cont curr=tmp;
-int val=1;
-while( x!=NULL && y!=NULL && val==1){
-	val=updateMBR(x,y,curr);
-	x=x->arr[0]->par_cont;
-	y=tmp->arr[0]->parent;
+while( x!=NULL && y!=NULL){
+	updateMBR(x,y,curr);
 	curr=x;
+	y=x->arr[0]->parent;
+	x=x->arr[0]->par_cont;
 	}
+if(curr==r->Root){
 
+}
 
 if(tmp->size==(M+1)){
 overflow(r,tmp);
@@ -608,6 +632,7 @@ int main()
     printf("affwwrgf\n");
     else
     printf("1111\n");
-    printf("%d, %f, %f, %f \n", rt->Root->arr[2]->child->arr[0]->child->size,rt->Root->arr[0]->child->arr[0]->I[0][1],rt->Root->arr[0]->child->arr[0]->I[1][0],rt->Root->arr[0]->child->arr[0]->I[1][1]);
+    printf("%d, %f, %f, %f \n", rt->Root->arr[1]->child->arr[2]->child->size,rt->Root->arr[0]->child->I[0][1],rt->Root->arr[0]->child->I[1][0],rt->Root->arr[0]->child->I[1][1]);
+    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->child->arr[0]->child->arr[0]->I[0][0],rt->Root->arr[0]->child->arr[0]->child->arr[0]->I[0][1],rt->Root->arr[0]->child->arr[0]->child->arr[0]->I[1][0],rt->Root->arr[0]->child->arr[0]->child->arr[0]->I[1][1]);
     return 0;
 }
