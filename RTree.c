@@ -107,6 +107,11 @@ Node createNewNode(NodeType type,int entryCount,Entry entries[])    //called imp
         node->entries[i] = entries[i];
     }
 
+    for(int i=entryCount;i<M+1;i++)
+    {
+        node->entries[i] = NULL;
+    }
+    
     defineMBR(node);
     return node;    
 }
