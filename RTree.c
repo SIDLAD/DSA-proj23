@@ -273,9 +273,11 @@ else{
 			}
 		}
 		u[0]->arr[u[0]->size]=u[1]->arr[tmp_var];
-		u[1]->arr[tmp_var]=NULL;
+		for(int i=tmp_var+1;i<u[1]->size;i++)
+			u[1]->arr[i-1]=u[1]->arr[i-1];
+		u[1]->arr[u[1]->size-1]=NULL;
 		u[1]->size--;
-			
+		
 	}
 	if(u[1]->size<m){
 		int tmp_var=0;
@@ -290,7 +292,9 @@ else{
 			}
 		}
 		u[1]->arr[u[1]->size]=u[0]->arr[tmp_var];
-		u[0]->arr[tmp_var]=NULL;
+		for(int i=tmp_var+1;i<u[0]->size;i++)
+			u[0]->arr[i-1]=u[0]->arr[i-1];
+		u[0]->arr[u[0]->size-1]=NULL;
 		u[0]->size--;
 			
 	}
@@ -347,7 +351,6 @@ if(tmp->arr[0]->parent==NULL){
 	r->Root=new;
 	assignchild(new_root_1,new,u0);
 	assignchild(new_root_2,new,u1);
-	free(tmp);
 
 }
 
@@ -359,25 +362,16 @@ printf("hi\n");
 	(u0->arr[0]->parent)->I[0][1]=u0->I[0][1];
 	(u0->arr[0]->parent)->I[1][0]=u0->I[1][0];
 	(u0->arr[0]->parent)->I[1][1]=u0->I[1][1];
-	printf("his\n");
+	assignchild(tmp->arr[0]->parent,tmp->arr[0]->par_cont,u0);
 	Node new_tmp = createNewNode(u1->I[0][0],u1->I[0][1],u1->I[1][0],u1->I[1][1]);
 	assignchild(new_tmp,tmp->arr[0]->par_cont,u1);
-	tmp->arr[0]->par_cont->arr[tmp->arr[0]->par_cont->size]=new_tmp;
-	tmp->arr[0]->par_cont->size++;
-	cont x=u1->arr[0]->par_cont;
-	Node y=u1->arr[0]->parent;
-	cont curr=u1;
-	int val=1;
-	while( x!=NULL && y!=NULL && val==1){
-		val=updateMBR(x,y,curr);
-		x=x->arr[0]->par_cont;
-		y=tmp->arr[0]->parent;
-		curr=x;
-		}
-	printf("hi\n");
-	if(tmp->arr[0]->par_cont->size==M+1)
-	overflow(r, tmp->arr[0]->par_cont);	
-	free(tmp);
+	bool tmp_leaf=u0->arr[0]->par_cont->isLeaf;
+	u0->arr[0]->par_cont->isLeaf=1;
+	fillcont(r, new_tmp, tmp->arr[0]->par_cont);
+	u0->arr[0]->par_cont->isLeaf=tmp_leaf;
+	
+	printf("sizezzdwfwe: %d\n", tmp->arr[0]->par_cont->size);
+
 	
 		
 }
@@ -594,7 +588,7 @@ int main()
     printf("g insert:%d\n",rt->Root->isLeaf);
     fillcont(rt,g, rt->Root);
     printf("h insert:%d\n",rt->Root->isLeaf);
-    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
+    printf("%f, %f, %f, %f \n", rt->Root->arr[0]->child->arr[0]->I[0][0],rt->Root->arr[0]->I[0][1],rt->Root->arr[0]->I[1][0],rt->Root->arr[0]->I[1][1]);
     fillcont(rt,h, rt->Root);
     fillcont(rt,i, rt->Root);
     fillcont(rt,j, rt->Root);
@@ -610,6 +604,10 @@ int main()
     fillcont(rt,t, rt->Root);
     fillcont(rt,u, rt->Root);
     printf("%f, %f, %f, %f \n", rt->Root->I[0][0],rt->Root->I[0][1],rt->Root->I[1][0],rt->Root->I[1][1]);
-    printf("%f, %f, %f, %f \n", rt->Root->arr[2]->I[0][0],rt->Root->arr[2]->I[0][1],rt->Root->arr[2]->I[1][0],rt->Root->arr[2]->I[1][1]);
+    if(rt->Root->arr[1]->child->arr[0]==NULL)
+    printf("affwwrgf\n");
+    else
+    printf("1111\n");
+    printf("%d, %f, %f, %f \n", rt->Root->arr[2]->child->arr[0]->child->size,rt->Root->arr[0]->child->arr[0]->I[0][1],rt->Root->arr[0]->child->arr[0]->I[1][0],rt->Root->arr[0]->child->arr[0]->I[1][1]);
     return 0;
 }
