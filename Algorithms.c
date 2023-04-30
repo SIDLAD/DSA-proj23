@@ -19,7 +19,7 @@ Node CBSSplitNode(Node node);                                           //node t
 void calcCovRect(float answer[dim],Entry entry);
 int calcGroup(float objRect[dim],float covRect[dim]);
 int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim]);
-float calculateOverlap(Node node1, Node node2);   //calculate sthe extent of overlap between two nodes
+float calculateOverlap(Node node1, Node node2);   //calculates the extent of overlap between two nodes
 int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim);
 
 LinkedList createNewLinkedList();
@@ -183,13 +183,13 @@ Node CBSSplitNode(Node node)                                            //node t
         countC[group]++;
     }
 
-    int splitDim = chooseSplitDimension(C,countC);                      //make sure to ignore entries in C where countC = 0
+    int splitDim = chooseSplitDimension(C,countC);
 
     Entry _e[] = {NULL}; 
     Node temp1 = createNewNode(! node->isLeaf,0,_e);
     Node temp2 = createNewNode(! node->isLeaf,0,_e);
 
-    for(int i=0;i<(1<<dim);i++)     //10110 & 100
+    for(int i=0;i<(1<<dim);i++)
     {
         if(i&(1<<splitDim))
         {
@@ -309,7 +309,7 @@ int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim])
     return splitDim;
 }
 
-float calculateOverlap(Node node1, Node node2){   //calculate sthe extent of overlap between two nodes
+float calculateOverlap(Node node1, Node node2){   //calculates the extent of overlap between two nodes
     float overlap=1;
     for (int i=0;i<dim;i++){
         float max_min=node1->I[0][i]>node2->I[0][i]? node1->I[0][i]:node2->I[0][i];
