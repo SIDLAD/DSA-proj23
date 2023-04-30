@@ -2,9 +2,9 @@
 
 To run the Project, use the make file. 
 
-```$ make```  - This will clean the directory, compile the code and run the program. 
+1. ```$ make```  - This will clean the directory, compile the code and run the program. It also logs all outputs to ```temp.log```.
 
-```$ make clean``` - This will clean the directory. This is by default run when you run make, before new files are compiled.
+2. ```$ make clean``` - This will clean the directory. This is by default run when you run make, before new files are compiled.
 
 _Do not copy the ```$``` symbol. It is just to indicate that the command is to be run in the terminal._
 
@@ -16,3 +16,8 @@ To install gcc, run the following command in the terminal:
 ```$ sudo apt install make```
 3. _Optional_ ```gdb``` - GNU Debugger. This is used to debug the code. To install gdb, run the following command in the terminal:
 ```$ sudo apt install gdb```
+
+## Assumptions
+
+1. The input file is in the same directory as the code.
+2. The input file has points for only two dimensions, in the format ```"x y\n"```, except for the last line which is just ```"x y"```.

@@ -1,5 +1,5 @@
 DSA-proj23: clean Project
-	./Project
+	./Project 2>&1 | tee temp.log
 debug: Project
 	gdb Project
 Project: main.c RTree.o Algorithms.o Helper.o

@@ -14,7 +14,8 @@ int main()
     // |0   |   1|
     // ===========
 
-    RTree rTree = import_from_file("large_data.txt");
+    // RTree rTree = import_from_file("large_data.txt");
+    RTree rTree = import_from_file("data.txt");
     printRTree(rTree);
     return 0;
 }
