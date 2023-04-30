@@ -1,48 +1,9 @@
-//TODO: Neatify code
-#include "RTree.c"
+// #include "RTree.h"
 #include <limits.h> //to be removed
-#include<float.h>   //to be removed
-
-typedef struct linkedList* LinkedList;
-typedef struct linkedNode* LinkedNode;
-/*All typedefs above this*/
-float calculateArea(Entry E1);
-float calculateCombinedArea(Entry E1, Entry E2);
-
-bool updateMBR(Node parent,Entry newChild);
-
-RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
-Node ChooseLeaf(Data dataEntry,RTree rtree);
-bool AdjustTree(RTree rtree,Node node1, Node node2);                                //node2 is null if original node was not split
-
-Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
-void calcCovRect(float answer[dim],Entry entry);
-int calcGroup(float objRect[dim],float covRect[dim]);
-int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim]);
-float calculateOverlap(Node node1, Node node2);   //calculates the extent of overlap between two nodes
-int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim);
-
-LinkedList createNewLinkedList();
-LinkedList addToLinkedList(Data data, LinkedList list);
-
-LinkedList searchRecursive(Node node, float S[2][dim],LinkedList list);
-LinkedList search(RTree rtree, float S[2][dim]);
-
-bool overlaps(float I[2][dim],float S[2][dim]);
-/*Function declarations above this*/
-
-struct linkedList
-{
-    LinkedNode start;
-    LinkedNode end;
-    int count;
-};
-
-struct linkedNode
-{
-    Data data;
-    LinkedNode next;
-};
+#include <float.h>   //to be removed
+#include <stdio.h>  //to be removed
+#include <stdlib.h> //to be removed
+#include "Algorithms.h"
 /*All structure definitions above this*/
 
 float calculateArea(Entry E1)
@@ -322,6 +283,7 @@ float calculateOverlap(Node node1, Node node2){   //calculates the extent of ove
     }
     return overlap;
 }
+
 int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim)
 {
     int index=-1;
@@ -487,6 +449,8 @@ int main()
     InsertNewDataEntry(coordinates19,NULL,rtree);
     InsertNewDataEntry(coordinates20,NULL,rtree);
     InsertNewDataEntry(coordinates21,NULL,rtree);
+    
+    
     // printf("hello working world\n");
     // float searchQuery[2][dim] = {6,5,6,5};
     // printf("Search tupleIdentifier at (6,5) : %s\n",search(rtree,searchQuery)->start->data->tupleIdentifier);
@@ -507,7 +471,7 @@ int main()
     // printf("Node Height = %d\n",nodeHeight(node));
     // printf("Node level = %d\n",nodeLevel(node));
     // printf("\nrtree MBR is: (%f %f) to (%f %f)\n",rtree->root->I[0][0],rtree->root->I[0][1],rtree->root->I[1][0],rtree->root->I[1][1]);
-
+    
     // float objRect[dim];
     // calcCovRect(objRect,(Entry)coordinates);
 
@@ -519,7 +483,7 @@ int main()
     // printf("Group number of (1,8): %d\n",calcGroup(coordinates3,covRect));
     // printf("Group number of (-1.8.9): %d\n",calcGroup(coordinates4,covRect));
     // printf("Group number of (6,5): %d\n\n",calcGroup(coordinates5,covRect));
-
+    
     return 0;
 }
 */
