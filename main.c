@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Algorithms.h"
+#include "Helper.h"
 // #include "RTree.h"
 //For debugging purposes://
 int main()
@@ -14,52 +14,53 @@ int main()
     // |0   |   1|
     // ===========
 
-    RTree rtree = createNewRTree();
+    RTree rTree = import_from_file("large_data.txt");
+    // RTree rtree = createNewRTree();
 
-    float coordinates1[dim] = {1,9};
-    float coordinates2[dim] = {2,20};
-    float coordinates3[dim] = {2,19};
-    float coordinates4[dim] = {3,20};
-    float coordinates5[dim] = {2,10};
-    float coordinates6[dim] = {8,5};
-    float coordinates7[dim] = {4,5};
-    float coordinates8[dim] = {3,4};
-    float coordinates9[dim] = {3,5};
-    float coordinates10[dim] = {2,4};
-    float coordinates11[dim] = {2,5};
-    float coordinates12[dim] = {8,15};
-    float coordinates13[dim] = {8,14};
-    float coordinates14[dim] = {7,15};
-    float coordinates15[dim] = {9,14};
-    float coordinates16[dim] = {9,15};
-    float coordinates17[dim] = {9,16};
-    float coordinates18[dim] = {9,17};
-    float coordinates19[dim] = {12,17};
-    float coordinates20[dim] = {11,18};
-    float coordinates21[dim] = {1,20};
+    // float coordinates1[dim] = {1,9};
+    // float coordinates2[dim] = {2,20};
+    // float coordinates3[dim] = {2,19};
+    // float coordinates4[dim] = {3,20};
+    // float coordinates5[dim] = {2,10};
+    // float coordinates6[dim] = {8,5};
+    // float coordinates7[dim] = {4,5};
+    // float coordinates8[dim] = {3,4};
+    // float coordinates9[dim] = {3,5};
+    // float coordinates10[dim] = {2,4};
+    // float coordinates11[dim] = {2,5};
+    // float coordinates12[dim] = {8,15};
+    // float coordinates13[dim] = {8,14};
+    // float coordinates14[dim] = {7,15};
+    // float coordinates15[dim] = {9,14};
+    // float coordinates16[dim] = {9,15};
+    // float coordinates17[dim] = {9,16};
+    // float coordinates18[dim] = {9,17};
+    // float coordinates19[dim] = {12,17};
+    // float coordinates20[dim] = {11,18};
+    // float coordinates21[dim] = {1,20};
 
     
-    InsertNewDataEntry(coordinates1,NULL,rtree);
-    InsertNewDataEntry(coordinates2,NULL,rtree);
-    InsertNewDataEntry(coordinates3,NULL,rtree);
-    InsertNewDataEntry(coordinates4,NULL,rtree);
-    InsertNewDataEntry(coordinates5,NULL,rtree);
-    InsertNewDataEntry(coordinates6,NULL,rtree);
-    InsertNewDataEntry(coordinates7,NULL,rtree);
-    InsertNewDataEntry(coordinates8,NULL,rtree);
-    InsertNewDataEntry(coordinates9,NULL,rtree);
-    InsertNewDataEntry(coordinates10,NULL,rtree);
-    InsertNewDataEntry(coordinates11,NULL,rtree);
-    InsertNewDataEntry(coordinates12,NULL,rtree);
-    InsertNewDataEntry(coordinates13,NULL,rtree);
-    InsertNewDataEntry(coordinates14,NULL,rtree);
-    InsertNewDataEntry(coordinates15,NULL,rtree);
-    InsertNewDataEntry(coordinates16,NULL,rtree);
-    InsertNewDataEntry(coordinates17,NULL,rtree);
-    InsertNewDataEntry(coordinates18,NULL,rtree);
-    InsertNewDataEntry(coordinates19,NULL,rtree);
-    InsertNewDataEntry(coordinates20,NULL,rtree);
-    InsertNewDataEntry(coordinates21,NULL,rtree);
+    // InsertNewDataEntry(coordinates1,NULL,rtree);
+    // InsertNewDataEntry(coordinates2,NULL,rtree);
+    // InsertNewDataEntry(coordinates3,NULL,rtree);
+    // InsertNewDataEntry(coordinates4,NULL,rtree);
+    // InsertNewDataEntry(coordinates5,NULL,rtree);
+    // InsertNewDataEntry(coordinates6,NULL,rtree);
+    // InsertNewDataEntry(coordinates7,NULL,rtree);
+    // InsertNewDataEntry(coordinates8,NULL,rtree);
+    // InsertNewDataEntry(coordinates9,NULL,rtree);
+    // InsertNewDataEntry(coordinates10,NULL,rtree);
+    // InsertNewDataEntry(coordinates11,NULL,rtree);
+    // InsertNewDataEntry(coordinates12,NULL,rtree);
+    // InsertNewDataEntry(coordinates13,NULL,rtree);
+    // InsertNewDataEntry(coordinates14,NULL,rtree);
+    // InsertNewDataEntry(coordinates15,NULL,rtree);
+    // InsertNewDataEntry(coordinates16,NULL,rtree);
+    // InsertNewDataEntry(coordinates17,NULL,rtree);
+    // InsertNewDataEntry(coordinates18,NULL,rtree);
+    // InsertNewDataEntry(coordinates19,NULL,rtree);
+    // InsertNewDataEntry(coordinates20,NULL,rtree);
+    // InsertNewDataEntry(coordinates21,NULL,rtree);
     
     /*
     printf("hello working world\n");
