@@ -3,7 +3,7 @@
 // #include "RTree.h"
 #include "Helper.h"
 
-void printNode(Node node)
+void printNode(Node node, int depth)
 {
     if(node->isLeaf)
     {
@@ -34,21 +34,69 @@ void printNode(Node node)
                 printf("%f ",((Data)(node->entries[i]))->I[0][j]);
             }
             printf("\n");
-            // printf("Height: %d\n",((Data)(node->entries[i]))->height);
+            printNode((Node)(node->entries[i]), depth+1);
         }
     }
 }
 
-void printRTree(RTree rtree) //INCOMPLETE
+void printNode2(Node node, int depth)
 {
+    if(node->isLeaf)
+    {
+        // printf("Leaf Node\n");
+        // printf("Entry Count: %d\n",node->entryCount);
+        for(int i=0;i<node->entryCount;i++)
+        {
+            // printf("Entry %d:\n",i);
+            // printf("Coordinates: ");
+            for(int j=0;j<dim;j++)
+            {
+                printf("%ld",(long)((Data)(node->entries[i]))->coordinates[j]);
+                if(j!=dim-1)
+                    printf(" ");
+            }
+            printf("\n");
+            // printf("Tuple Identifier: %s\n",((Data)(node->entries[i]))->tupleIdentifier);
+        }
+    }
+    else
+    {
+        // printf("Internal Node\n");
+        // printf("Entry Count: %d\n",node->entryCount);
+        for(int i=0;i<node->entryCount;i++)
+        {
+            // printf("Entry %d:\n",i);
+            // printf("Coordinates: ");
+            for(int j=0;j<dim;j++)
+            {
+                1;
+                // printf("%f ",((Data)(node->entries[i]))->I[0][j]);
+            }
+            // printf("\n");
+            printNode2((Node)(node->entries[i]), depth+1);
+        }
+    }
+}
+
+void printRTree(RTree rtree)
+{
+    if(rtree == NULL)
+    {
+        printf("Empty RTree\n");
+        return;
+    }
+
     if(rtree->root == NULL)
     {
         printf("Empty RTree\n");
         return;
     }
+
     printf("Root Node:\n");
-    printNode(rtree->root);
+    // printNode(rtree->root);
+    printNode2(rtree->root, 1);
 }
+
 
 RTree import_from_file(char *filename)
 {
@@ -60,23 +108,8 @@ RTree import_from_file(char *filename)
         return NULL;
     }
 
-    /* for general dimensions
-    while(!fp->eof())
-    {
-        float coordinates[dim];
-        char tupleIdentifier[100];
-        for(int j=0;j<dim;j++)
-        {
-            fscanf(fp,"%f",&coordinates[j]);
-            scanf("%c");
-        }
-        // fscanf(fp,"%s",tupleIdentifier);
-        Data data = createDataItem(coordinates,tupleIdentifier);
-        insertData(rtree,data);
-    }*/
-
+    // long counter = 0;
     char *c;
-    //for 2 dimensions
     while(!feof(fp))
     {
         float coordinates[dim];
@@ -86,11 +119,12 @@ RTree import_from_file(char *filename)
         fscanf(fp,"%c",c);
         // if (feof(fp)) break;
         fscanf(fp,"%f",&coordinates[1]);
-        if (feof(fp)) break;
-        fscanf(fp,"%c",c);
+        if (!feof(fp)) fscanf(fp,"%c",c);
         rtree = InsertNewDataEntry(coordinates, tupleIdentifier, rtree);
+        // counter++;
     }
     fclose(fp);
+    // printf("Number of entries: %ld\n",counter);
     return rtree;
 }
 
