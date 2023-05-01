@@ -114,7 +114,22 @@ void printRTree(RTree rtree)
         return;
     }
 
-    printf("Root Node:\n");
+    printf("\n\nRoot Node:\n");
+    printf("   Min Coordinates: (");
+    for(int j=0;j<dim;j++)
+    {
+        printf("%06ld",(long)(rtree->root)->I[0][j]);
+        if (j!=dim-1)
+            printf(" ");
+    }
+    printf(") Max Coordinates: (");
+    for(int j=0;j<dim;j++)
+    {
+        printf("%06ld",(long)(rtree->root)->I[1][j]);
+        if (j!=dim-1)
+            printf(" ");
+    }
+    printf(")\n");
     printNode(rtree->root, 1);
     // printNode2(rtree->root, 1);
 }
@@ -138,9 +153,12 @@ RTree import_from_file(char *filename)
         char tupleIdentifier[100];
         fscanf(fp,"%f",&coordinates[0]);
         // if (feof(fp)) break;
-        fscanf(fp,"%c",c);
-        // if (feof(fp)) break;
-        fscanf(fp,"%f",&coordinates[1]);
+        for(int i=1;i<dim;i++)
+        {
+            fscanf(fp,"%c",c);
+            // if (feof(fp)) break;
+            fscanf(fp,"%f",&coordinates[i]);
+        }
         if (!feof(fp)) fscanf(fp,"%c",c);
         rtree = InsertNewDataEntry(coordinates, tupleIdentifier, rtree);
         // counter++;
