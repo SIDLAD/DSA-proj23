@@ -21,7 +21,7 @@ To install gcc, run the following command in the terminal:
 
 1. The input file is in the same directory as the code.
 2. The input file has points for only two dimensions, in the format ```"x y\n"```, except for the last line which is just ```"x y"```.
-3. If you wish to use the R-Tree for N-Dimensional points, then
-    a. Make sure to go to RTree.h and change the value that dim is defined to the number of dimensions
-    b. Create a new input file (for example 3D-data.txt), in the format:  ```"x y .. z\n"```, except for the last line which is just ```"x y .. z"```.
+3. If you wish to use the R-Tree for N-Dimensional points, then\
+    a. Make sure to go to RTree.h and change the value that dim is defined to the number of dimensions\
+    b. Create a new input file (for example 3D-data.txt), in the format:  ```"x y .. z\n"```, except for the last line which is just ```"x y .. z"```.\
     c. In main.c, go to line 18, and replace "data.txt" with the name of your file in double quotes.
