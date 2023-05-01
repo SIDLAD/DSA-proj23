@@ -3,208 +3,197 @@
 #include<string.h>
 #include<stdio.h>
 #include<math.h>
+#include "RTree.h"
 /*Libraries to include above this*/
 
-#define dim 2               //number of dimensions = 2
-#define M 4
-#define m 2
-/*Macros defined above this*/
+// #define dim 2               //number of dimensions = 2
+// #define M 4
+// #define m 2
+// /*Macros defined above this*/
 
-typedef struct RTree* RTree;
-typedef struct Node* Node;
-typedef struct Internal* Internal;
-typedef struct Leaf* Leaf;
+// typedef struct rTree* RTree;
+// typedef struct node* Node;
+// typedef struct entry* Entry;
+// typedef struct data* Data;
+// typedef enum nodeType NodeType;
+// /*All typedefs above this*/
 
-typedef enum nodeType nodeType;
-/*All typedefs above this*/
+// enum nodeType{LEAF = 0,INTERNAL = 1};
+// /*All enums defined above this*/
 
-enum nodeType{LEAF = 0,INTERNAL = 1};
-/*All enums defined above this*/
-
-RTree createNewRTree();
-bool isEmpty(RTree rtree);
-Node createNewNode(nodeType type);
-Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim]);
-Node createNewInternalNode(Node* children, int childrenCount);
-bool updateMBR(Node node);
-int nodeLevel(Node node);
-bool isRoot(Node node);
-bool isLeaf(Node node);
-bool isInternal(Node node);
+// RTree createNewRTree();
+// bool isEmpty(RTree rtree);
+// Data createDataItem(float coordinates[dim],char* tupleIdentifier);
+// Node createNewNode(NodeType type,int entryCount,Entry entries[]);   //called implicitly while creating leaf or internal node
+// Node createNewLeafNode(int entryCount,Data dataEntries[]);
+// Node createNewInternalNode(int entryCount,Node nodeEntries[]);
+// bool defineMBR(Node node);
+// int nodeLevel(Node node);
+// int nodeHeight(Node node);
+// bool isRoot(Node node);
 /*Function declarations above this*/
 
-struct Node
-{
-    Node Parent;
-    bool isLeaf;
-    int I[2][dim];          //Minimum Bounding region
-    void * E;
-};
 
-struct Internal
-{
-    Node Child[M];          // array of pointers pointing to its children
-    int childrenCount;
-};
-
-struct Leaf
-{
-    char* tupleIdentifier;  //name of Entity        
-    int coordinates[dim];   //coordinates
-    //Data data;            //points to a location in the disk storing Data
-};
-
-struct RTree
-{
-    Node Root;
-};
 /*All structure definitions above this*/
 
 RTree createNewRTree()
 {
-    RTree rtree = (RTree) malloc(sizeof(struct RTree));
-    rtree->Root = NULL;
+    RTree rtree = (RTree) malloc(sizeof(struct rTree));
+    rtree->root = NULL;
     return rtree;
 }
 
 bool isEmpty(RTree rtree)
 {
-    if (rtree->Root == NULL)
+    if (rtree->root == NULL)
         return true;
     return false;
 }
 
-Node createNewNode(nodeType type)
+Data createDataItem(float coordinates[dim],char* tupleIdentifier)
 {
-    Node node = (Node) malloc(sizeof(struct Node));
-    node->isLeaf = !(type);
-    if(node->isLeaf)
-    {
-        node->E = malloc(sizeof(struct Leaf));
-    }
-    else
-    {
-        node->E = malloc(sizeof(struct Internal));
-    }
-
-    return node;
-}
-
-Node createNewLeafNode(char* tupleIdentifier,int coordinates[dim])
-{
-    Node node = createNewNode(LEAF);
-    Leaf leaf = (Leaf)node->E;
-    
-    leaf->tupleIdentifier = (char*) malloc(sizeof(tupleIdentifier));
-    strcpy(leaf->tupleIdentifier, tupleIdentifier);
+    Data data = (Data) malloc(sizeof(struct data));
 
     for(int i=0;i<dim;i++)
     {
-        leaf->coordinates[i] = coordinates[i];
+        data->I[0][i] = data->I[1][i] = data->coordinates[i] = coordinates[i];
     }
 
-    updateMBR(node);
-    return node;
-}
-
-Node createNewInternalNode(Node* children, int childrenCount)
-{
-    if(!(childrenCount>=m &&childrenCount<=M))
-        return NULL;                                    //if NULL returned, internal node is NOT created as number of children is not between m and M
-
-    Node node = createNewNode(INTERNAL);
-    Internal internal = (Internal)node->E;
-
-    internal->childrenCount = childrenCount;
-    for(int i=0;i<childrenCount;i++)
-    {
-        children[i]->Parent = node;
-        internal->Child[i] = children[i];
-    }
-
-    updateMBR(node);
-    return node;
-}
-
-bool updateMBR(Node node)
-{
-    if(isLeaf(node))
-    {
-        Leaf leaf = (Leaf)node->E;
-        for(int i=0;i<dim;i++)
-        {
-            node->I[0][i] = node->I[1][i] = leaf->coordinates[i];
-        }
-    }
-    else if(isInternal(node))
-    {
-        Internal internal = (Internal)node->E;
-        if(internal->childrenCount < m) return false;
-        for(int j=0;j<dim;j++)
-        {
-            node->I[0][j] = (internal->Child[0]->I[0][j]);
-            node->I[1][j] = (internal->Child[0]->I[1][j]);
-        }
-        for(int i=1;i<internal->childrenCount;i++)
-        {
-            for(int j=0;j<dim;j++)
-            {
-                node->I[0][j] = fmin(node->I[0][j],internal->Child[i]->I[0][j]);
-                node->I[1][j] = fmax(node->I[1][j],internal->Child[i]->I[1][j]);
-            }
-        }
-    }
+    data->tupleIdentifier = (char*)malloc(sizeof(tupleIdentifier));
+    if(tupleIdentifier !=NULL)
+        strcpy(data->tupleIdentifier,tupleIdentifier);
     else
-        return false;
+        strcpy(data->tupleIdentifier,"");
+
+    return data;
+}
+
+Node createNewNode(NodeType type,int entryCount,Entry entries[])    //called implicitly while creating leaf or internal node
+{
+    if(entryCount>M || entryCount<0)
+        return NULL;
+
+    Node node = (Node) malloc(sizeof(struct node));
+    node->isLeaf = !type;
+    node->entryCount = entryCount;
+
+    for(int i=0;i<entryCount;i++)
+    {
+        node->entries[i] = entries[i];
+    }
+
+    for(int i=entryCount;i<M+1;i++)
+    {
+        node->entries[i] = NULL;
+    }
+    
+    defineMBR(node);
+    return node;    
+}
+
+Node createNewLeafNode(int entryCount, Data dataEntries[])
+{
+    Node node = createNewNode(LEAF,entryCount,(Entry*) dataEntries);
+    return node;
+}
+
+Node createNewInternalNode(int entryCount,Node nodeEntries[])
+{
+    Node node = createNewNode(INTERNAL,entryCount,(Entry*) nodeEntries);
+    if(node == NULL)
+        return node;
+    for(int i=0;i<entryCount;i++)
+    {
+        ((Node)node->entries[i])->parent = node;
+    }
+
+    return node;
+}
+
+bool defineMBR(Node node)
+{
+    if(node->entryCount <= 0)
+        return false;                                                  //false is returned if node has no entries
+
+    for(int i=0;i<dim;i++)
+    {
+        node->I[0][i] = node->entries[0]->I[0][i];
+        node->I[1][i] = node->entries[0]->I[1][i];
+    }
+    for(int i=0;i<dim;i++)
+    {
+        for(int j=0;j<node->entryCount;j++)
+        {
+            if(node->I[0][i] > node->entries[j]->I[0][i])
+                node->I[0][i] = node->entries[j]->I[0][i];
+            if(node->I[1][i] < node->entries[j]->I[1][i])
+                node->I[1][i] = node->entries[j]->I[1][i];
+        }
+    }
     return true;
 }
 
-int nodeLevel(Node node)                                //O(log n) operation
+int nodeLevel(Node node)
 {
-    int count = 0;
-    while(isInternal(node))
+    int level = 0;
+    while(! node->isLeaf)
     {
-        count++;
-        node = ((Internal)node->E)->Child[0];
+        level++;
+        node = (Node)node->entries[0];
     }
-    return count;
+    return level;
+}
+
+int nodeHeight(Node node)
+{
+    int height = 0;
+    while(!isRoot(node))
+    {
+        height++;
+        node = node->parent;
+    }
+    return height;
 }
 
 bool isRoot(Node node)
 {
-    if(node->Parent == NULL)
+    if(node->parent == NULL)
+    {
         return true;
+    }
     return false;
 }
 
-bool isLeaf(Node node)
-{
-    if(node->isLeaf)
-        return true;
-    return false;
-}
-
-bool isInternal(Node node)
-{
-    if(!(node->isLeaf))
-        return true;
-    return false;
-}
 /*R-Tree ADT and basic functions defined above*/
 
 /*
 //For debugging purposes://
 int main()
 {
-    int l[2] = {1,3};
-    int p[2] = {2,4};
-    Node a = createNewLeafNode("bi",l);
+    printf("Hello\n");
+    float coordinates[dim] = {1,0};
+    float coordinates2[dim] = {2,3};
+    float coordinates3[dim] = {1,9};
+    float coordinates4[dim] = {-1,8.9};
+    Data item = createDataItem(coordinates,"IAmDaBomb");
+    Data item2 = createDataItem(coordinates2,"MeDaBomb");
+    Data item3 = createDataItem(coordinates3,"BombaBombaBombBomb");
+    Data item4 = createDataItem(coordinates4,"YouDaBomb");
 
-    Node b = createNewLeafNode("gr",p);
-    Node nar[2]={a,b};
-    int c[2] = {1,2};
-    Node e = createNewInternalNode(nar,sizeof(nar)/sizeof(nar[0]));
-    Node d = createNewLeafNode("as",c);
-    Internal internal = (Internal)e->E;
+    Data items[] = {item,item2};
+    Data items2[] = {item3,item4};
+    Node leaf = createNewLeafNode(sizeof(items)/sizeof(items[0]),items);
+    Node leaf2 = createNewLeafNode(sizeof(items2)/sizeof(items2[0]),items2);
+
+    Node arrayOfLeaves[] = {leaf,leaf2};
+    Node internal = createNewInternalNode(sizeof(arrayOfLeaves)/sizeof(arrayOfLeaves[0]),arrayOfLeaves);
+
+    RTree rtree = createNewRTree();
+    rtree->root = internal;
+    for(int i=0;i<dim;i++)
+    {
+        printf("%f %f\n",rtree->root->I[0][i],rtree->root->I[1][i]);
+    }
+    return 0;
 }
 */
