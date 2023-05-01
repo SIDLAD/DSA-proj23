@@ -2,7 +2,6 @@
 
 typedef struct linkedList* LinkedList;
 typedef struct linkedNode* LinkedNode;
-/*All typedefs above this*/
 float calculateArea(Entry E1);
 float calculateCombinedArea(Entry E1, Entry E2);
 
@@ -26,7 +25,6 @@ LinkedList searchRecursive(Node node, float S[2][dim],LinkedList list);
 LinkedList search(RTree rtree, float S[2][dim]);
 
 bool overlaps(float I[2][dim],float S[2][dim]);
-/*Function declarations above this*/
 
 struct linkedList
 {

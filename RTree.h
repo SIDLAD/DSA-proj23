@@ -9,7 +9,6 @@ typedef struct node* Node;
 typedef struct entry* Entry;
 typedef struct data* Data;
 typedef enum nodeType NodeType;
-/*All typedefs above this*/
 
 struct entry
 {
@@ -31,7 +30,6 @@ struct data
     float I[2][dim];
     float coordinates[dim];
     char* tupleIdentifier;
-    //Data_Contents contents;
 };
 
 struct rTree
@@ -39,7 +37,6 @@ struct rTree
     Node root;
 };
 enum nodeType{LEAF = 0,INTERNAL = 1};
-/*All enums defined above this*/
 
 RTree createNewRTree();
 bool isEmpty(RTree rtree);
