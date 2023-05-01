@@ -14,7 +14,9 @@ typedef struct node* Node;
 typedef struct entry* Entry;
 typedef struct data* Data;
 typedef enum nodeType NodeType;
-/*All typedefs above this*/
+
+typedef struct linkedList* LinkedList;
+typedef struct linkedNode* LinkedNode;
 
 struct entry
 {
@@ -44,20 +46,19 @@ struct rTree
     Node root;
 };
 enum nodeType{LEAF = 0,INTERNAL = 1};
-/*All enums defined above this*/
 
-RTree createNewRTree();
-bool isEmpty(RTree rtree);
-Data createDataItem(float coordinates[dim],char* tupleIdentifier);
-Node createNewNode(NodeType type,int entryCount,Entry entries[]);   //called implicitly while creating leaf or internal node
-Node createNewLeafNode(int entryCount,Data dataEntries[]);
-Node createNewInternalNode(int entryCount,Node nodeEntries[]);
-bool defineMBR(Node node);
-int nodeLevel(Node node);
-int nodeHeight(Node node);
-bool isRoot(Node node);
+struct linkedList
+{
+    LinkedNode start;
+    LinkedNode end;
+    int count;
+};
 
-
+struct linkedNode
+{
+    Data data;
+    LinkedNode next;
+};
 
 RTree createNewRTree()
 {
@@ -72,6 +73,47 @@ bool isEmpty(RTree rtree)
         return true;
     return false;
 }
+
+/*All enums defined above this*/
+
+RTree createNewRTree();
+bool isEmpty(RTree rtree);
+Data createDataItem(float coordinates[dim],char* tupleIdentifier);
+Node createNewNode(NodeType type,int entryCount,Entry entries[]);   //called implicitly while creating leaf or internal node
+Node createNewLeafNode(int entryCount,Data dataEntries[]);
+Node createNewInternalNode(int entryCount,Node nodeEntries[]);
+bool defineMBR(Node node);
+int nodeLevel(Node node);
+int nodeHeight(Node node);
+bool isRoot(Node node);
+
+float calculateArea(Entry E1);
+float calculateCombinedArea(Entry E1, Entry E2);
+
+bool updateMBR(Node parent,Entry newChild);
+
+RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
+Node ChooseLeaf(Data dataEntry,RTree rtree);
+bool AdjustTree(RTree rtree,Node node1, Node node2);                                //node2 is null if original node was not split
+
+Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
+void calcCovRect(float answer[dim],Entry entry);
+int calcGroup(float objRect[dim],float covRect[dim]);
+int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim]);
+float calculateOverlap(Node node1, Node node2);   //calculates the extent of overlap between two nodes
+int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim);
+
+LinkedList createNewLinkedList();
+LinkedList addToLinkedList(Data data, LinkedList list);
+
+LinkedList searchRecursive(Node node, float S[2][dim],LinkedList list);
+LinkedList search(RTree rtree, float S[2][dim]);
+
+bool overlaps(float I[2][dim],float S[2][dim]);
+
+void printNode(Node node, int depth);
+void printRTree(RTree rtree);
+RTree import_from_file(char *filename);
 
 Data createDataItem(float coordinates[dim],char* tupleIdentifier)
 {
@@ -186,47 +228,6 @@ bool isRoot(Node node)
     }
     return false;
 }
-
-typedef struct linkedList* LinkedList;
-typedef struct linkedNode* LinkedNode;
-float calculateArea(Entry E1);
-float calculateCombinedArea(Entry E1, Entry E2);
-
-bool updateMBR(Node parent,Entry newChild);
-
-RTree InsertNewDataEntry(float coordinates[dim],char* tupleIdentifier,RTree rtree);
-Node ChooseLeaf(Data dataEntry,RTree rtree);
-bool AdjustTree(RTree rtree,Node node1, Node node2);                                //node2 is null if original node was not split
-
-Node CBSSplitNode(Node node);                                           //node that is going to be split will TEMPORARILY have M+1 entries
-void calcCovRect(float answer[dim],Entry entry);
-int calcGroup(float objRect[dim],float covRect[dim]);
-int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim]);
-float calculateOverlap(Node node1, Node node2);   //calculates the extent of overlap between two nodes
-int objectIndexNearSplitDim(Node node,float covRect[dim],int splitDim);
-
-LinkedList createNewLinkedList();
-LinkedList addToLinkedList(Data data, LinkedList list);
-
-LinkedList searchRecursive(Node node, float S[2][dim],LinkedList list);
-LinkedList search(RTree rtree, float S[2][dim]);
-
-bool overlaps(float I[2][dim],float S[2][dim]);
-
-struct linkedList
-{
-    LinkedNode start;
-    LinkedNode end;
-    int count;
-};
-
-struct linkedNode
-{
-    Data data;
-    LinkedNode next;
-};
-
-
 
 float calculateArea(Entry E1)
 {
@@ -611,11 +612,6 @@ bool overlaps(float I[2][dim],float S[2][dim])
     return isOverlap;                               //else I and S overlap
 }
 
-void printNode(Node node, int depth);
-void printRTree(RTree rtree);
-RTree import_from_file(char *filename);
-
-
 void printNode(Node node, int depth)
 {
     char *indent = (char *) malloc(sizeof(char) * (depth + 1));
@@ -626,14 +622,11 @@ void printNode(Node node, int depth)
     indent[depth] = '\0';
     if(node->isLeaf)
     {
-        // printf("%sLeaf Node\n", indent);
-        // printf("%sData Points\n", indent);
         for(int i=0;i<node->entryCount;i++)
         {
             printf("%s%d. (", indent, i+1);
             for(int j=0;j<dim;j++)
             {
-                // printf("%06ld",(long)(((Data)(node->entries[i]))->coordinates[j]));
                 printf("%ld",(long)(((Data)(node->entries[i]))->coordinates[j]));
                 if(j!=dim-1)
                     printf(",");
@@ -643,13 +636,11 @@ void printNode(Node node, int depth)
     }
     else
     {
-        // printf("%s%s\n", indent, node->isLeaf ? "Leaf Node" : "Internal Node" );
         for(int i=0;i<node->entryCount;i++)
         {
             printf("%s%d. (%s) Min Coordinates: (", indent, i+1, ((Node)(node->entries[i]))->isLeaf ? "Leaf Node" : "Internal Node");
             for(int j=0;j<dim;j++)
             {
-                // printf("%06ld",(long)(((Node)(node->entries[i]))->I[0][j]));
                 printf("%ld",(long)(((Node)(node->entries[i]))->I[0][j]));
                 if (j!=dim-1)
                     printf(",");
@@ -657,7 +648,6 @@ void printNode(Node node, int depth)
             printf(") Max Coordinates: (");
             for(int j=0;j<dim;j++)
             {
-                // printf("%06ld",(long)(((Node)(node->entries[i]))->I[1][j]));
                 printf("%ld",(long)(((Node)(node->entries[i]))->I[1][j]));
                 if (j!=dim-1)
                     printf(",");
@@ -686,7 +676,6 @@ void printRTree(RTree rtree)
     printf("Min Coordinates: (");
     for(int j=0;j<dim;j++)
     {
-        // printf("%06ld",(long)(((Node)(rtree->root))->I[0][j]));
         printf("%ld",(long)(((Node)(rtree->root))->I[0][j]));
         if (j!=dim-1)
             printf(",");
@@ -694,7 +683,6 @@ void printRTree(RTree rtree)
     printf(") Max Coordinates: (");
     for(int j=0;j<dim;j++)
     {
-        // printf("%06ld",(long)(((Node)(rtree->root))->I[1][j]));
         printf("%ld",(long)(((Node)(rtree->root))->I[1][j]));
         if (j!=dim-1)
             printf(",");
@@ -742,8 +730,8 @@ int main()
     // |0   |   1|
     // ===========
 
-    // RTree rTree = import_from_file("large_data.txt");
-    RTree rTree = import_from_file("data.txt");
+    RTree rTree = import_from_file("large_data.txt");
+    // RTree rTree = import_from_file("data.txt");
     printRTree(rTree);
     return 0;
 }
