@@ -26,4 +26,4 @@ To install gcc, run the following command in the terminal:
 3. If you wish to use the R-Tree for N-Dimensional points, then\
     a. Make sure to go to DSA-proj23.c and change the value that dim is defined to the number of dimensions (line 8).\
     b. Create a new input file (for example 3D-data.txt), in the format:  ```"x y .. z\n"```, except for the last line which is just ```"x y .. z"```.\
-    c. In DSA-proj23.c, go to line 734 (inside the main function), and replace "data.txt" with the name of your file in double quotes.
+    c. In DSA-proj23.c, go to line 737 (inside the main function), and replace "data.txt" with the name of your file in double quotes.
