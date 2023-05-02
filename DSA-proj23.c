@@ -471,7 +471,7 @@ int chooseSplitDimension(Entry C[1<<dim][M+1],int countC[1<<dim])
             overlap=kOverlap;
             area=kArea;
         }
-        else if(kDif==minDif){
+        else if((kDif==minDif && dim!=2) || (countC[1]==countC[2] && dim==2)){  //in the CBS research paper, they have not checked tie breaker condition for countC[0] equal to countC[3], so we have explicitly avoided that check for dim = 2, though in all fairness, they should check that condition for tie breaker as well
             if(kOverlap<overlap){
                 splitDim=k;
                 minDif=kDif;
