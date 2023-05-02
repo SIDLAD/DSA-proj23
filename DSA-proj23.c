@@ -709,8 +709,11 @@ RTree import_from_file(char *filename)
         float coordinates[dim];
         char tupleIdentifier[100];
         fscanf(fp,"%f",&coordinates[0]);
-        fscanf(fp,"%c",c);
-        fscanf(fp,"%f",&coordinates[1]);
+        for(int i=1;i<dim;i++)
+        {
+            fscanf(fp,"%c",c);
+            fscanf(fp,"%f",&coordinates[i]);
+        }
         if (!feof(fp)) fscanf(fp,"%c",c);
         rtree = InsertNewDataEntry(coordinates, tupleIdentifier, rtree);
     }
