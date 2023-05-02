@@ -10,7 +10,7 @@ To run the Project, follow these instructions.
 
 _Do not copy the ```$``` symbol. It is just to indicate that the command is to be run in the terminal._
 
-By default this looks for a file called ```data.txt``` in the same directory as the code. To change this, edit the string ```"data.txt"``` in line 734 of ```DSA-proj23.c``` to the path of the file you want to use. We recommend you use the absolute path, and that the path has no spaces or special characters in it (If it does, please use the escape character ```\``` before the special character and/or deal with it appropriately).
+By default this looks for a file called ```data.txt``` in the same directory as the code. To change this, edit the string ```"data.txt"``` in line 737 of ```DSA-proj23.c``` to the path of the file you want to use. We recommend you use the absolute path, and that the path has no spaces or special characters in it (If it does, please use the escape character ```\``` before the special character and/or deal with it appropriately).
 
 ## Dependencies
 1. ```gcc``` - GNU Compiler Collection. This is used to compile the code. Tested on ```gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04) ```.
