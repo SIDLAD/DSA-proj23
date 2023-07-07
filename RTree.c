@@ -1,3 +1,11 @@
+/**
+ * @contributors:   SIDLAD,
+ *                  VedangNadkarni,
+ *                  shaipranesh2,
+ *                  Aryan-Seth,
+ *                  krteyu
+*/
+
 #include<stdlib.h>
 #include<stdbool.h>
 #include<string.h>

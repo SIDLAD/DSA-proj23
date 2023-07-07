@@ -1,3 +1,11 @@
+/**
+ * @contributors:   SIDLAD,
+ *                  VedangNadkarni,
+ *                  shaipranesh2,
+ *                  Aryan-Seth,
+ *                  krteyu
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 // #include "RTree.h"

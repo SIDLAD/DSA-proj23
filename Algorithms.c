@@ -1,3 +1,11 @@
+/**
+ * @contributors:   SIDLAD,
+ *                  VedangNadkarni,
+ *                  shaipranesh2,
+ *                  Aryan-Seth,
+ *                  krteyu
+*/
+
 // #include "RTree.h"
 #include <limits.h> //to be removed
 #include <float.h>   //to be removed

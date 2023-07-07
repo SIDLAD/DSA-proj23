@@ -1,3 +1,11 @@
+/**
+ * @contributors:   SIDLAD,
+ *                  VedangNadkarni,
+ *                  shaipranesh2,
+ *                  Aryan-Seth,
+ *                  krteyu
+*/
+
 #include <stdbool.h>
 
 #define dim 2               //number of dimensions = 2

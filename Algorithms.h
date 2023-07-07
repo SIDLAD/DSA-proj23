@@ -1,3 +1,11 @@
+/**
+ * @contributors:   SIDLAD,
+ *                  VedangNadkarni,
+ *                  shaipranesh2,
+ *                  Aryan-Seth,
+ *                  krteyu
+*/
+
 #include "RTree.h"
 
 typedef struct linkedList* LinkedList;
